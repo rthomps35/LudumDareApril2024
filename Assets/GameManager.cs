@@ -12,16 +12,18 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-	public int TimeRemaining;	
+	
 
 	#region ChildObjects and their Scripts
 	[SerializeField] GameObject GameCamera; //Added in inspector
 	[SerializeField] GameObject UIManager;  //Added in inspector
 	[SerializeField] GameObject MapManager; //Added in inspector
-	//Below code was copied from an old project
-	//[SerializeField] CameraManager CameraManager;   //These are the core scripts of the above objects.
-	//[SerializeField] UIManager UIManagerScript;     //These scripts arn't attached to make the GameManager Object cleaner.
-	//[SerializeField] MapManager MapManagerScript;
+	#endregion
+
+	#region Timer Items
+	public int TimeRemaining;
+	[SerializeField] float passedSeconds;
+	
 	#endregion
 
 	//Awake contains the Don't Destroy on Load command. It'll keep this script running the whole time.
@@ -40,13 +42,18 @@ public class GameManager : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-
+		TimerSystem();
 	}
 
 	//Timer
 	void TimerSystem()
 	{
-		//Time DeltaTimeShit
+		passedSeconds += Time.deltaTime;
+		if (passedSeconds >= 1)
+		{
+			passedSeconds =0;
+			TimeRemaining -= 1;
+		}
 	}
 
 	#region TitleScreen Specific Code
@@ -65,9 +72,9 @@ public class GameManager : MonoBehaviour
 	//Scene Managment
 	public void NewGame()
 	{
-		Action load = delegate () { NewGameSetUp(); };  //Okay so this actually runs
+		Action load = delegate () { NewGameSetUp(); };
 		StartCoroutine(AsyncLoader("MainGame", load));
-
+		//Map and everything shoujld be set up in the coroutine right?
 	}
 
 	IEnumerator AsyncLoader(string SceneName, Action SetUpMethod)
