@@ -6,12 +6,24 @@ using UnityEngine.SceneManagement;
 
 
 /// <summary>
-/// The GameManager Script handles the scenes and the transition between them.
-/// A seperate script might handle the main game loop. This just handles the program's loop
+/// The GameManager script is gonna just be a spaghetti mess where it handles the program loop and the gameplay loop.
+/// The game is simple enough that it shouldn't matter.
 /// </summary>
 
 public class GameManager : MonoBehaviour
 {
+	public int TimeRemaining;	
+
+	#region ChildObjects and their Scripts
+	[SerializeField] GameObject GameCamera; //Added in inspector
+	[SerializeField] GameObject UIManager;  //Added in inspector
+	[SerializeField] GameObject MapManager; //Added in inspector
+	//Below code was copied from an old project
+	//[SerializeField] CameraManager CameraManager;   //These are the core scripts of the above objects.
+	//[SerializeField] UIManager UIManagerScript;     //These scripts arn't attached to make the GameManager Object cleaner.
+	//[SerializeField] MapManager MapManagerScript;
+	#endregion
+
 	//Awake contains the Don't Destroy on Load command. It'll keep this script running the whole time.
 	private void Awake()
 	{
@@ -19,21 +31,9 @@ public class GameManager : MonoBehaviour
 	}
 
 
-	#region ChildObjects and their Scripts
-	[SerializeField] GameObject GameCamera; //Added in inspector
-	[SerializeField] GameObject UIManager;  //Added in inspector
-	[SerializeField] GameObject MapManager; //Added in inspector
-											//Simulation Manager?
-	//[SerializeField] CameraManager CameraManager;   //These are the core scripts of the above objects.
-	//[SerializeField] UIManager UIManagerScript;     //These scripts arn't attached to make the GameManager Object cleaner.
-	//[SerializeField] MapManager MapManagerScript;
-	#endregion
-
-
 	// Start is called before the first frame update
 	void Start()
 	{
-
 
 	}
 
@@ -43,8 +43,25 @@ public class GameManager : MonoBehaviour
 
 	}
 
+	//Timer
+	void TimerSystem()
+	{
+		//Time DeltaTimeShit
+	}
+
+	#region TitleScreen Specific Code
+	void TitlePageScreen()
+	{
+		//Start the timer
+		//Move to next screen after
+	}
+	#endregion
+	#region MainGame Specific Code
+	
+	#endregion
 
 
+	#region Scene Management
 	//Scene Managment
 	public void NewGame()
 	{
@@ -79,5 +96,5 @@ public class GameManager : MonoBehaviour
 	{
 		Debug.Log(SceneManager.GetActiveScene().name);
 	}
-
+	#endregion
 }
