@@ -24,7 +24,7 @@ public class PlayerController : MonoBehaviour
 	void playerMovementAndControl()
 	{
 
-		//It reall needs a ramp up to the proper speed
+		//It really needs a ramp up to the proper speed
 		//Its way too floaty right now but it can be fixed later. It needs to slowly scale the speed up just like it slows down
 
 		if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.W))
@@ -72,6 +72,7 @@ public class PlayerController : MonoBehaviour
 	void InteractWithGrave()
 	{
 		//Should take a specific amount of time to up the tension
+		//throw a interaction thing in front and a progress bar in front of the player?
 	}
 
 	

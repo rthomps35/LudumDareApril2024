@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -12,51 +13,83 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-	
+
 
 	#region ChildObjects and their Scripts
+	[SerializeField] GameObject GameManger;	
 	[SerializeField] GameObject GameCamera; //Added in inspector
 	[SerializeField] GameObject UIManager;  //Added in inspector
-	//[SerializeField] GameObject MapManager; Handled in this script
+											//[SerializeField] GameObject MapManager; Handled in this script
 	#endregion
 
 	#region Timer Items
-	public int TimeRemaining;
+	[SerializeField] int startingTimeMinutes;   //time at the start of the game in seconds	
+	public int MinutesRemaining;
+	public int SecondsRemaining;
 	[SerializeField] float passedSeconds;
 	#endregion
 
 	#region Map Items
 	[SerializeField] int mapWidth;	//may mpt be meeded
 	[SerializeField] int mapHeight;	//may not be needed
-	[SerializeField] GameObject gameMap;	//object that holds the map tiles
+	[SerializeField] GameObject gameMap;    //object that holds the map tiles
+
+	//Tracked Items
+	[SerializeField] List<GameObject> graves= new List<GameObject>();
+	[SerializeField] List<GameObject> spawns= new List<GameObject>();
+	[SerializeField] List<GameObject> allTiles= new List<GameObject>();
+	
 	//Tiles
 	[SerializeField] GameObject GrassTile;
 	[SerializeField] GameObject GraveTile;
 	[SerializeField] GameObject WalkwayTile;
 	[SerializeField] GameObject BorderTile;
 	[SerializeField] GameObject SpawnTile;
-
+	
+	bool MapGenerated;
 	[SerializeField] Texture2D mapPNG;  //The map texture
 	#endregion
+
+	[SerializeField] enum programState {Title, MainGame}
+	[SerializeField] programState currentProgramState;
 
 	//Awake contains the Don't Destroy on Load command. It'll keep this script running the whole time.
 	private void Awake()
 	{
 		DontDestroyOnLoad(this.gameObject);
+		MapGenerated= false;
 	}
 
 
 	// Start is called before the first frame update
 	void Start()
 	{
-		//For Testing
-		MapGenerator();
+		currentProgramState = programState.Title;
+		Debug.Log(SceneManager.GetActiveScene().name);
+		
 	}
 
 	// Update is called once per frame
 	void Update()
-	{
-		TimerSystem();
+	{		
+		switch(currentProgramState)
+		{
+			case programState.Title:
+				TitlePageScreen();
+				break;
+			case programState.MainGame:
+				//MainGameLoop
+				TimerSystem();
+				//Win/Fail
+				//testing
+				if(Input.GetKeyDown(KeyCode.Escape))
+				{
+					ReturnToTitle();
+					//invoke the failed state
+					//load the title
+				}
+				break;
+		}
 	}
 
 	//Timer
@@ -66,22 +99,61 @@ public class GameManager : MonoBehaviour
 		if (passedSeconds >= 1)
 		{
 			passedSeconds =0;
-			TimeRemaining -= 1;
+			SecondsRemaining -= 1;
+			if (SecondsRemaining < 0 && MinutesRemaining >= 1)
+			{
+				SecondsRemaining = 59;
+				MinutesRemaining -= 1;
+			}
+			else
+			{
+				//Game Over!
+			}
 		}
 	}
 
 	#region TitleScreen Specific Code
 	void TitlePageScreen()
 	{
-		//Start the timer
-		//Move to next screen after
+		if (MapGenerated == false)
+		{
+			MapGenerator(); //Generate the Map. This map will follow to the next screen
+			MapGenerated = true;
+		}
+		
+		//for the start it will linger until the player presses "enter" or "return"
+		if(Input.GetKeyDown(KeyCode.Return)||Input.GetKeyDown(KeyCode.KeypadEnter))
+		{
+			NewGame();	//Load the next scene
+		}
 	}
-	#endregion
-	#region MainGame Specific Code
-	void MainGameSetUp()
+
+	void titleSetUp()
 	{
-		//Set the timer
-		//Spawn the bodies
+		MapGenerated= false;
+		
+		//testing deleting the map
+		foreach(GameObject tile in allTiles)
+		{
+			Destroy(tile);
+		}
+		//Start playing title music?
+
+	}
+
+	#endregion
+
+	#region MainGame Specific Code
+	void NewGameSetUp()
+	{
+		Time.timeScale = 0; //Stop the clock
+		MinutesRemaining = startingTimeMinutes; //set timer
+		SecondsRemaining = 0;
+		gameMap.SetActive(true);
+		//pick a spawn position
+		//spawn player at player position
+		//run dialogue from client
+		Debug.Log(SceneManager.GetActiveScene().name);
 	}
 	#endregion
 
@@ -90,18 +162,16 @@ public class GameManager : MonoBehaviour
 	{
 		mapPNG = Resources.Load<Texture2D>("Maps/testMap");	//Grab the provincemap
 		
-		Debug.Log($"Max X:{mapWidth},{mapHeight}");
-
 		for (int y = 0; y < mapPNG.height;y++)
 		{
 			for (int x = 0; x < mapPNG.width; x++)
 			{
 				Color thisPixel = mapPNG.GetPixel(x, y);
 				instantiater(thisPixel,x,y);	//make the tile based on the RGB value
-
 			}
 		}
-		
+		//pick the first spawn loaction
+		//Set up the body locations
 		Debug.Log($"Map Initialization ended at:{DateTime.Now}");
 		gameMap.SetActive(false);       //set the map to inactive
 	}
@@ -126,30 +196,40 @@ public class GameManager : MonoBehaviour
 		else if(r == 64 && g == 64 && b == 64)
 		{
 			newGameObject = Instantiate(GraveTile, new Vector3(x, y), Quaternion.identity, gameMap.transform);	//Graves
+			graves.Add(newGameObject);
 		}
 		else if (r == 255 && g == 0 && b == 0)
 		{
 			newGameObject = Instantiate(SpawnTile, new Vector3(x, y), Quaternion.identity, gameMap.transform);	//Spwan
+			spawns.Add(newGameObject);
 		}
 		else
 		{
 			newGameObject = Instantiate(GrassTile, new Vector3(x, y), Quaternion.identity, gameMap.transform);	//The default is just grass
 		}
-		
+		allTiles.Add(newGameObject);
 		newGameObject.name = $"Tile{x}.{y}";
 	}
 	#endregion
 
 
 	#region Scene Management
-	//Scene Managment
 	public void NewGame()
 	{
 		Action load = delegate () { NewGameSetUp(); };
 		StartCoroutine(AsyncLoader("MainGame", load));
-		//Map and everything should be set up in the coroutine right?
+		currentProgramState = programState.MainGame;
 	}
 
+	public void ReturnToTitle()
+	{
+		Action load = delegate () { titleSetUp(); };
+		StartCoroutine(AsyncLoader("TitleScreen", load));
+		currentProgramState = programState.Title;
+	}	
+	
+
+	//Asynchronous loaded I think I got in the documentation or stack overflow
 	IEnumerator AsyncLoader(string SceneName, Action SetUpMethod)
 	{
 		// The Application loads the Scene in the background as the current Scene runs.
@@ -167,14 +247,6 @@ public class GameManager : MonoBehaviour
 		}
 		//Everything below here loads after the Coroutine
 		SetUpMethod();
-		//UIManagerScript.FindSceneCanvas(GameCamera);
-	}
-
-
-
-	void NewGameSetUp()
-	{
-		Debug.Log(SceneManager.GetActiveScene().name);
 	}
 	#endregion
 }

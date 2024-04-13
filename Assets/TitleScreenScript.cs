@@ -4,15 +4,14 @@ using UnityEngine;
 
 public class TitleScreenScript : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+	[SerializeField] GameObject GameManagerPrefab;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	private void Awake()
+	{
+		if(GameObject.FindGameObjectWithTag("GameManager") == null)
+		{
+			Instantiate(GameManagerPrefab);
+		}
+
+	}
 }
