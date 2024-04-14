@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
 	[SerializeField] GameObject GameCamera; //Added in inspector
 	[SerializeField] GameObject UIManager;  //Added in inspector
 											//[SerializeField] GameObject MapManager; Handled in this script
+	[SerializeField] UIManager UIManagerScript;
 	#endregion
 
 	#region Timer Items
@@ -64,6 +65,9 @@ public class GameManager : MonoBehaviour
 
 	#region NPCs
 	[SerializeField] GameObject NPCPrefab;
+	[SerializeField] GameObject ActiveNPC;
+	[SerializeField] NPCScript NPCScript;
+	[SerializeField] List<GameObject> PossibleNPCs = new List<GameObject>();
 	#endregion
 
 	#region Body Parts
@@ -98,11 +102,14 @@ public class GameManager : MonoBehaviour
 				TitlePageScreen();
 				break;
 			case programState.MainGame:
+				//Start Sequence
+
 				//MainGameLoop
 				cameraUpdate();
 				playerController.PlayerMovementAndControl();
 				
 				TimerSystem();
+				UIManagerScript.UpdateTimer(MinutesRemaining,SecondsRemaining);
 				//Win/Fail
 
 				//testing
@@ -181,6 +188,8 @@ public class GameManager : MonoBehaviour
 		Time.timeScale = 0; //Stop the clock
 		MinutesRemaining = startingTimeMinutes; //set timer
 		SecondsRemaining = 0;
+		UIManagerScript = GameObject.FindGameObjectWithTag("UI").GetComponent<UIManager>();
+		UIManagerScript.UpdateTimer(MinutesRemaining, SecondsRemaining);	//update the timer
 		gameMap.SetActive(true);
 		player = Instantiate(PlayerPrefab, new Vector3(activeSummonSpawn.transform.position.x, activeSummonSpawn.transform.position.y, -1), Quaternion.identity);
 		playerController = player.GetComponent<PlayerController>();
