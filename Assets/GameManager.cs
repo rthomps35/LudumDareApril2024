@@ -37,17 +37,34 @@ public class GameManager : MonoBehaviour
 	//Tracked Items
 	[SerializeField] List<GameObject> graves= new List<GameObject>();
 	[SerializeField] List<GameObject> spawns= new List<GameObject>();
+	[SerializeField] List<GameObject> possibleSpawns = new List<GameObject>();
 	[SerializeField] List<GameObject> allTiles= new List<GameObject>();
-	
+	[SerializeField] GameObject activeSummonSpawn;
+	[SerializeField] GameObject player;
+	[SerializeField] PlayerController playerController;
+
+
 	//Tiles
 	[SerializeField] GameObject GrassTile;
 	[SerializeField] GameObject GraveTile;
 	[SerializeField] GameObject WalkwayTile;
 	[SerializeField] GameObject BorderTile;
 	[SerializeField] GameObject SpawnTile;
+
+	//other prefabs
+	[SerializeField] GameObject PlayerPrefab;
+		
 	
 	bool MapGenerated;
 	[SerializeField] Texture2D mapPNG;  //The map texture
+	#endregion
+
+	#region NPCs
+	[SerializeField] GameObject NPCPrefab;
+	#endregion
+
+	#region Body Parts
+	[SerializeField] GameObject BodyPartPrefab;
 	#endregion
 
 	[SerializeField] enum programState {Title, MainGame}
@@ -79,10 +96,14 @@ public class GameManager : MonoBehaviour
 				break;
 			case programState.MainGame:
 				//MainGameLoop
+				cameraUpdate();
+				playerController.PlayerMovementAndControl();
+				
 				TimerSystem();
 				//Win/Fail
+
 				//testing
-				if(Input.GetKeyDown(KeyCode.Escape))
+				if (Input.GetKeyDown(KeyCode.Escape))
 				{
 					ReturnToTitle();
 					//invoke the failed state
@@ -150,14 +171,29 @@ public class GameManager : MonoBehaviour
 		MinutesRemaining = startingTimeMinutes; //set timer
 		SecondsRemaining = 0;
 		gameMap.SetActive(true);
-		//pick a spawn position
-		//spawn player at player position
+		player = Instantiate(PlayerPrefab, new Vector3(activeSummonSpawn.transform.position.x, activeSummonSpawn.transform.position.y, -1), Quaternion.identity);
+		playerController = player.GetComponent<PlayerController>();
+		GameCamera.transform.position = new Vector3(player.transform.position.x, player.transform.position.y,-3); //Move camera to active spawn
 		//run dialogue from client
+		//TEST
+		Time.timeScale = 1;
+		//TEST
 		Debug.Log(SceneManager.GetActiveScene().name);
 	}
+	void nextSummonPositionSpawn()
+	{
+		//I'd like to make sure the spawns don't repeat themselves
+	}
+
+	//Follows the player
+	void cameraUpdate()
+	{
+		GameCamera.transform.position = new Vector3(player.transform.position.x, player.transform.position.y,-3);
+	}
+	
 	#endregion
 
-	#region MapGenerator
+	#region Map Generation
 	void MapGenerator()
 	{
 		mapPNG = Resources.Load<Texture2D>("Maps/testMap");	//Grab the provincemap
@@ -170,8 +206,8 @@ public class GameManager : MonoBehaviour
 				instantiater(thisPixel,x,y);	//make the tile based on the RGB value
 			}
 		}
-		//pick the first spawn loaction
-		//Set up the body locations
+		activeSummonSpawn = spawns[UnityEngine.Random.Range(0, spawns.Count)];//pick the first spawn loaction
+															  //Set up the body locations
 		Debug.Log($"Map Initialization ended at:{DateTime.Now}");
 		gameMap.SetActive(false);       //set the map to inactive
 	}
@@ -208,7 +244,7 @@ public class GameManager : MonoBehaviour
 			newGameObject = Instantiate(GrassTile, new Vector3(x, y), Quaternion.identity, gameMap.transform);	//The default is just grass
 		}
 		allTiles.Add(newGameObject);
-		newGameObject.name = $"Tile{x}.{y}";
+		//newGameObject.name = $"Tile{x}.{y}";
 	}
 	#endregion
 
