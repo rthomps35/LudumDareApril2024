@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour
 
 		//It really needs a ramp up to the proper speed
 		//Its way too floaty right now but it can be fixed later. It needs to slowly scale the speed up just like it slows down
-
+		/*
 		if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.W))
 		{
 			rigidbody2D.velocity = new Vector2(-speed, speed);   //left up
@@ -59,7 +59,7 @@ public class PlayerController : MonoBehaviour
 			rigidbody2D.velocity = new Vector2(speed, -speed);   //right down
 			playerFacing= PlayerFacing.Right;
 		}
-		else if (Input.GetKey(KeyCode.W))
+		else */if (Input.GetKey(KeyCode.W))
 		{
 			rigidbody2D.velocity = new Vector2(0.0f, speed);	//up
 			playerFacing= PlayerFacing.Up;
