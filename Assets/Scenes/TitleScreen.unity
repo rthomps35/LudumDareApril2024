@@ -285,6 +285,10 @@ PrefabInstance:
       propertyPath: PlayerPrefab
       value: 
       objectReference: {fileID: 8456840738594917594, guid: 95ad05e6ead4e7d4cad63be348b04bad, type: 3}
+    - target: {fileID: 7037866941990661326, guid: 475953fe603872742973985c52b3bcb1, type: 3}
+      propertyPath: orthographic size
+      value: 8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 6663251013779949165, guid: 475953fe603872742973985c52b3bcb1, type: 3}

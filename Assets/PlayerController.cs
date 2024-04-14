@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] PlayerFacing playerFacing;
 	public float speed; //This should be the max speed probably? Right and just work up to it
 						//interaction field?
+	
 	//Sprites
 	[SerializeField] SpriteRenderer playerSprite;
 	[SerializeField] Sprite UpSprite;
@@ -153,10 +154,15 @@ public class PlayerController : MonoBehaviour
 	}
 
 	//The dig thing
-	void InteractWithGrave()
+	void Interaction()
 	{
 		//Should take a specific amount of time to up the tension
 		//throw a interaction thing in front and a progress bar in front of the player?
+		//if collided object is a grave
+			//DIG
+			//after digging select body parts
+		//If collided objec is an npc
+			//talk/end task
 	}
 
 	

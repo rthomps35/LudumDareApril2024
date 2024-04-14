@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -27,6 +28,8 @@ public class GameManager : MonoBehaviour
 	public int MinutesRemaining;
 	public int SecondsRemaining;
 	[SerializeField] float passedSeconds;
+	[SerializeField] bool crunchTime;			//Added this. Figured I can up the player speed in the last 30 seconds without telling the player.
+												//I just want a slight bump for those last second moments.
 	#endregion
 
 	#region Map Items
@@ -130,6 +133,14 @@ public class GameManager : MonoBehaviour
 			{
 				//Game Over!
 			}
+		}
+		if(MinutesRemaining == 0 && SecondsRemaining <= 30 && crunchTime == false)
+		{
+			crunchTime = true;
+		}
+		else if(MinutesRemaining >= 0 && SecondsRemaining > 45 && crunchTime == true)
+		{
+			crunchTime= false;
 		}
 	}
 
