@@ -244,7 +244,7 @@ public class GameManager : MonoBehaviour
 			newGameObject = Instantiate(GrassTile, new Vector3(x, y), Quaternion.identity, gameMap.transform);	//The default is just grass
 		}
 		allTiles.Add(newGameObject);
-		//newGameObject.name = $"Tile{x}.{y}";
+		newGameObject.name = $"Tile{x}.{y}";
 	}
 	#endregion
 
