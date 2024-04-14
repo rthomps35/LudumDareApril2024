@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 1963220601253715776}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.1905131, y: 0.5586707, z: 0.045924444}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -49,26 +49,30 @@ MonoBehaviour:
   GameManger: {fileID: 1963220601253715776}
   GameCamera: {fileID: 3537042680621250745}
   UIManager: {fileID: 0}
+  UIManagerScript: {fileID: 0}
   startingTimeMinutes: 5
   MinutesRemaining: 0
   SecondsRemaining: 0
   passedSeconds: 0
-  mapWidth: 25
-  mapHeight: 25
+  crunchTime: 0
   gameMap: {fileID: 5200358508219269553}
   graves: []
   spawns: []
   possibleSpawns: []
-  allTiles: []
   activeSummonSpawn: {fileID: 0}
   player: {fileID: 0}
+  playerController: {fileID: 0}
   GrassTile: {fileID: 1115167730612354981, guid: e08373a3f85b61e42b6c7e0418acb7d3, type: 3}
   GraveTile: {fileID: 1014260484911851294, guid: 64beba61803d8124db24b3ebf1947275, type: 3}
   WalkwayTile: {fileID: 0}
   BorderTile: {fileID: 225617015799502405, guid: 45e999a24fc56a04eb9e7f75657944ae, type: 3}
   SpawnTile: {fileID: 2835344762399980771, guid: e66e418f77fee0b4ea85b2e7722ac9b2, type: 3}
+  PlayerPrefab: {fileID: 8456840738594917594, guid: 95ad05e6ead4e7d4cad63be348b04bad, type: 3}
   mapPNG: {fileID: 0}
   NPCPrefab: {fileID: 0}
+  ActiveNPC: {fileID: 0}
+  NPCScript: {fileID: 0}
+  PossibleNPCs: []
   BodyPartPrefab: {fileID: 0}
   currentProgramState: 0
 --- !u!1 &3537042680621250745

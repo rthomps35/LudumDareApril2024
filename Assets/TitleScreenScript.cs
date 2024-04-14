@@ -5,12 +5,14 @@ using UnityEngine;
 public class TitleScreenScript : MonoBehaviour
 {
 	[SerializeField] GameObject GameManagerPrefab;
+	[SerializeField] GameObject GameManager;
 
-	private void Awake()
+	private void Start()
 	{
-		if(GameObject.FindGameObjectWithTag("GameManager") == null)
+		GameManager = GameObject.FindGameObjectWithTag("GameManager");
+		if (GameManager == null)
 		{
-			Instantiate(GameManagerPrefab);
+			GameManager = Instantiate(GameManagerPrefab);
 		}
 
 	}

@@ -44,3 +44,12 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Background
+    uniqueID: 1959102817
+    locked: 0
+  - name: WalkableObjects
+    uniqueID: 4139169239
+    locked: 0
+  - name: Objects
+    uniqueID: 1540719201
+    locked: 0

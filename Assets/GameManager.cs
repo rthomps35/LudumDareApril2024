@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using Unity.VisualScripting;
 using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -34,15 +35,14 @@ public class GameManager : MonoBehaviour
 	#endregion
 
 	#region Map Items
-	[SerializeField] int mapWidth;	//may mpt be meeded
-	[SerializeField] int mapHeight;	//may not be needed
 	[SerializeField] GameObject gameMap;    //object that holds the map tiles
+	public GameObject[,] MapTiles = new GameObject[0, 0];
+	
 
 	//Tracked Items
 	[SerializeField] List<GameObject> graves= new List<GameObject>();
 	[SerializeField] List<GameObject> spawns= new List<GameObject>();
 	[SerializeField] List<GameObject> possibleSpawns = new List<GameObject>();
-	[SerializeField] List<GameObject> allTiles= new List<GameObject>();
 	[SerializeField] GameObject activeSummonSpawn;
 	[SerializeField] GameObject player;
 	[SerializeField] PlayerController playerController;
@@ -106,7 +106,7 @@ public class GameManager : MonoBehaviour
 
 				//MainGameLoop
 				cameraUpdate();
-				playerController.PlayerMovementAndControl();
+				playerController.PokemonController();
 				
 				TimerSystem();
 				UIManagerScript.UpdateTimer(MinutesRemaining,SecondsRemaining);
@@ -170,11 +170,14 @@ public class GameManager : MonoBehaviour
 	void titleSetUp()
 	{
 		MapGenerated= false;
-		
+
 		//testing deleting the map
-		foreach(GameObject tile in allTiles)
+		for (int y = 0; y < MapTiles.GetLength(1); y++)
 		{
-			Destroy(tile);
+			for (int x = 0; x < MapTiles.GetLength(0); x++)
+			{
+				Destroy(MapTiles[x,y]);
+			}
 		}
 		//Start playing title music?
 
@@ -193,6 +196,7 @@ public class GameManager : MonoBehaviour
 		gameMap.SetActive(true);
 		player = Instantiate(PlayerPrefab, new Vector3(activeSummonSpawn.transform.position.x, activeSummonSpawn.transform.position.y, -1), Quaternion.identity);
 		playerController = player.GetComponent<PlayerController>();
+		playerController.GameManager = this;
 		GameCamera.transform.position = new Vector3(player.transform.position.x, player.transform.position.y,-3); //Move camera to active spawn
 		//run dialogue from client
 		//TEST
@@ -217,7 +221,8 @@ public class GameManager : MonoBehaviour
 	void MapGenerator()
 	{
 		mapPNG = Resources.Load<Texture2D>("Maps/testMap");	//Grab the provincemap
-		
+		MapTiles = new GameObject[mapPNG.width,mapPNG.height];
+
 		for (int y = 0; y < mapPNG.height;y++)
 		{
 			for (int x = 0; x < mapPNG.width; x++)
@@ -263,7 +268,8 @@ public class GameManager : MonoBehaviour
 		{
 			newGameObject = Instantiate(GrassTile, new Vector3(x, y), Quaternion.identity, gameMap.transform);	//The default is just grass
 		}
-		allTiles.Add(newGameObject);
+		
+		MapTiles[x, y] = newGameObject;
 		newGameObject.name = $"Tile{x}.{y}";
 	}
 	#endregion
