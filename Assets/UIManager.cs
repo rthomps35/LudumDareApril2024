@@ -12,6 +12,7 @@ public class UIManager : MonoBehaviour
 {
 	[SerializeField] TMP_Text timerText;
 	[SerializeField] TMP_Text textBox;
+	[SerializeField] Image	textImage;
 
 	public void UpdateTimer(int Minutes, int Seconds)
 	{
@@ -32,8 +33,11 @@ public class UIManager : MonoBehaviour
 
 	//Text routine couroutine that spookifies the text is needed
 
-	public void UpdateTextBox()
+	public void UpdateTextBox(string StringToPrint)
 	{
-
+		textBox.text = StringToPrint;
+		//Coroutine
+		//linger for 5 seconds
+		//delete after x number of seconds
 	}
 }

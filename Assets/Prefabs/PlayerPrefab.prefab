@@ -50,6 +50,9 @@ MonoBehaviour:
   rigidbody2D: {fileID: 3567616458702071582}
   playerFacing: 0
   speed: 5
+  secondsToDig: 2
+  digCompletionTime: 0
+  GraveTarget: {fileID: 0}
   playerSprite: {fileID: 3901204434803007779}
   UpSprite: {fileID: 21300000, guid: 4d4344d5b4c282b46a07f95a84a2b9c7, type: 3}
   DownSprite: {fileID: 21300000, guid: 5216298b8699a3448b8bef6203669d2a, type: 3}
