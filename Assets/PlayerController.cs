@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
 	
 	bool moving = false;
 	bool digging = false;
+	public bool CanMove = false;
 	[SerializeField] int secondsToDig = 3;
 	[SerializeField] int digCompletionTime;
 	[SerializeField] GraveScript GraveTarget;
@@ -35,7 +36,7 @@ public class PlayerController : MonoBehaviour
 		float step = speed * Time.deltaTime;
 		
 
-		if(moving == false && digging == false)
+		if(moving == false && digging == false && CanMove == true)
 		{
 			if (Input.GetKey(KeyCode.W))
 			{
@@ -97,7 +98,6 @@ public class PlayerController : MonoBehaviour
 						//Theres nothing left!
 					}
 				}
-				Debug.Log($"");
 			}
 		}
 		else

@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using TMPro;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
+using UnityEngine.UI;
 
 /// <summary>
 /// The GameManager script is gonna just be a spaghetti mess where it handles the program loop and the gameplay loop.
@@ -22,10 +23,9 @@ public class GameManager : MonoBehaviour
 	[SerializeField] GameObject GameManger;	
 	[SerializeField] GameObject GameCamera; //Added in inspector
 	[SerializeField] GameObject UIManager;  //Added in inspector
-	//[SerializeField] GameObject TextManager;											
 
 	[SerializeField] UIManager UIManagerScript;
-	[SerializeField] TextManager textManager;
+	
 	#endregion
 
 	#region Timer Items
@@ -74,6 +74,13 @@ public class GameManager : MonoBehaviour
 	[SerializeField] GameObject ActiveNPC;
 	[SerializeField] NPCScript NPCScript;
 	[SerializeField] List<GameObject> PossibleNPCs = new List<GameObject>();
+
+
+
+	//IndividualNPCS
+	public GameObject CurrentNPC;
+	[SerializeField] GameObject TutorialMan;
+
 	#endregion
 
 	#region Body Parts
@@ -91,18 +98,30 @@ public class GameManager : MonoBehaviour
 	[SerializeField] AudioClip MainMusic;
 	public AudioClip DigNoise;
 	
+	[SerializeField]Sprite PHsprite;
+
+
+	public List<GameObject> NPCS= new List<GameObject>();
+
+	//Scene Set Ups
+	bool NPCToIntroduce = true;
+	//bool mainGameSet = false;
+	bool TextSent = false;	//This is so the introductions work
 
 	//Awake contains the Don't Destroy on Load command. It'll keep this script running the whole time.
 	private void Awake()
 	{
 		DontDestroyOnLoad(this.gameObject);
 		MapGenerated= false;
+		UIManagerScript.UIMode();
+		Time.timeScale = 1;
 	}
 
 
 	// Start is called before the first frame update
 	void Start()
 	{
+		Debug.Log(Time.timeScale);
 		currentProgramState = programState.Title;
 		Debug.Log(SceneManager.GetActiveScene().name);
 	}
@@ -111,38 +130,7 @@ public class GameManager : MonoBehaviour
 	void Update()
 	{	
 		ProgramLoop();
-		/*
-		switch(currentProgramState)
-		{
-			case programState.Title:
-				TitlePageScreen();
-				break;
-			case programState.MainGame:
-				//Start Sequence
-				//Print A test line to the game
-				//MainGameLoop
-				cameraUpdate();
-				playerController.PokemonController();
-				
-				//TimerSystem();
-				UIManagerScript.UpdateTimer(MinutesRemaining,SecondsRemaining);
-				UIManagerScript.UpdateTextBox(textManager.CurrentText);
-				
-				if(lostGame == true)
-				{
-					//Lose Game
-				}
-
-				//testing
-				if (Input.GetKeyDown(KeyCode.Escape))
-				{
-					ReturnToTitle();
-					//invoke the failed state
-					//load the title
-				}
-				break;
-		}
-		*/
+		TicLoop();
 	}
 
 	void ProgramLoop()
@@ -154,22 +142,28 @@ public class GameManager : MonoBehaviour
 				TitlePageScreen();
 				break;
 			case programState.MainGame:
-				//Start Sequence
-				
-				
-				//Print A test line to the game
-				
-				
+				if(NPCToIntroduce == true)	//new NPC?
+				{
+					timerActive = false;
+					playerController.CanMove = false;
+					if (UIManagerScript.textQueue.Count == 0 && TextSent == true)
+					{
+						NPCToIntroduce = false;
+						playerController.CanMove = true;
+						timerActive = true;
+					}
+
+				}
 				//MainGameLoop
-				cameraUpdate();	//Move the camera to follow the player
-				
+				cameraUpdate(); //Move the camera to follow the player
+
 				//player
 				playerController.PokemonController();
-				
+
 
 				//UI
-				UIManagerScript.UpdateTimer(MinutesRemaining, SecondsRemaining);
-				UIManagerScript.UpdateTextBox(textManager.CurrentText);
+				//UIManagerScript.UpdateTimer(MinutesRemaining, SecondsRemaining);
+				//UIManagerScript.UpdateTextBox(textManager.CurrentText);
 
 				if (lostGame == true)
 				{
@@ -183,8 +177,14 @@ public class GameManager : MonoBehaviour
 					//invoke the failed state
 					//load the title
 				}
+
 				break;
+
+
 		}
+	}
+	void TicLoop()
+	{
 		//This is my strategy mental illness coming out
 		//Its a time/tic based game loop similar to Paradox Games
 		//Items that last x amount of time will be here.
@@ -204,6 +204,12 @@ public class GameManager : MonoBehaviour
 			
 			//Tic Specific Actions
 
+
+			//UI
+			UIManagerScript.UpdateUIEachSecond(MinutesRemaining,SecondsRemaining);
+			//TextUpdate
+
+
 			//The below is crunchtime, this should be a method
 			if (MinutesRemaining == 0 && SecondsRemaining <= 30 && crunchTime == false)
 			{
@@ -214,9 +220,6 @@ public class GameManager : MonoBehaviour
 				crunchTime = false;
 			}
 		}
-
-		
-
 	}
 
 	void GameTimer()
@@ -233,35 +236,6 @@ public class GameManager : MonoBehaviour
 		}
 	}
 
-	/*//Timer
-	void TimerSystem()
-	{
-		passedSeconds += Time.deltaTime;
-		if (passedSeconds >= 1)
-		{
-			passedSeconds =0;
-			SecondsRemaining -= 1;
-			TotalGameSeconds += 1;
-			if (SecondsRemaining < 0 && MinutesRemaining >= 1)
-			{
-				SecondsRemaining = 59;
-				MinutesRemaining -= 1;
-			}
-			else
-			{
-				lostGame = true;
-			}
-		}
-		if(MinutesRemaining == 0 && SecondsRemaining <= 30 && crunchTime == false)
-		{
-			crunchTime = true;
-		}
-		else if(MinutesRemaining >= 0 && SecondsRemaining > 45 && crunchTime == true)
-		{
-			crunchTime= false;
-		}
-	}
-	*/
 	#region TitleScreen Specific Code
 	void TitlePageScreen()
 	{
@@ -299,24 +273,32 @@ public class GameManager : MonoBehaviour
 	#region MainGame Specific Code
 	void NewGameSetUp()
 	{
-		Time.timeScale = 0; //Stop the clock
+		
 		MinutesRemaining = startingTimeMinutes; //set timer
 		SecondsRemaining = 0;
 		UIManagerScript = GameObject.FindGameObjectWithTag("UI").GetComponent<UIManager>();
-		UIManagerScript.UpdateTimer(MinutesRemaining, SecondsRemaining);	//update the timer
+		UIManagerScript.UpdateUIEachSecond(MinutesRemaining, SecondsRemaining);	//update the timer
 		gameMap.SetActive(true);
-		player = Instantiate(PlayerPrefab, new Vector3(activeSummonSpawn.transform.position.x, activeSummonSpawn.transform.position.y, -1), Quaternion.identity);
-		playerController = player.GetComponent<PlayerController>();
+		//player = Instantiate(PlayerPrefab, new Vector3(activeSummonSpawn.transform.position.x, activeSummonSpawn.transform.position.y, -1), Quaternion.identity);
+		player.transform.position = new Vector2(activeSummonSpawn.transform.position.x, activeSummonSpawn.transform.position.y);
+		player.SetActive(true);
+		//playerController = player.GetComponent<PlayerController>();
 		playerController.GameManager = this;
 		GameCamera.transform.position = new Vector3(player.transform.position.x, player.transform.position.y,-3); //Move camera to active spawn
-		AudioManager.Play(); //start playing music
-		//run dialogue from client
-		//TEST
-		Time.timeScale = 1;
-		//TEST
+		UIManagerScript.UIMode("MainGame");
+		currentProgramState = programState.MainGame;
+		NPCToIntroduce = true;
+		CurrentNPC = TutorialMan;
+		MainGameStart();
 		Debug.Log(SceneManager.GetActiveScene().name);
 	}
 
+	void MainGameStart()
+	{
+		//animate the spawn
+		CurrentNPC = TutorialMan;
+		IntroduceAnNPC(TutorialMan); //Introduce Tutorial
+	}
 
 	//Follows the player
 	void cameraUpdate()
@@ -325,6 +307,7 @@ public class GameManager : MonoBehaviour
 	}
 	
 	#endregion
+
 
 	#region Map Generation
 	void MapGenerator()
@@ -433,11 +416,29 @@ public class GameManager : MonoBehaviour
 	#endregion
 	
 	#region Text Specific
-	void DisplayText()
+	void IntroduceAnNPC(GameObject NPC)
 	{
-		//tell
+
+		NPCScript NPCS = NPC.GetComponent<NPCScript>();
+		
+		if (UIManagerScript.textQueue.Count == 0 && TextSent == true)
+		{
+			NPCS.Introduced = true;
+			playerController.CanMove = true;
+			timerActive = true;
+		}
+		else if(NPCS.Introduced == false)
+		{
+			UIManagerScript.BasicTextWriter(NPC, NPCS.NPCSprite, NPCS.IntroductionLines);
+			TextSent= true;
+		}
+		
 	}
 
+	void CheckIfIntroduced(GameObject NPC)
+	{
+
+	}
 
 	#endregion
 }
