@@ -8,6 +8,10 @@ public class GraveScript : MonoBehaviour
 	public bool isDiggable = true;
 	[SerializeField] Sprite DugSprite;
 	[SerializeField] SpriteRenderer SR;
+	public GameObject BodyPart;
+	public GameObject Tombstone;
+	public enum GraveType {Type1, Type2, Type3}
+	public GraveType Type;
 
 	public void iveBeenDug()
 	{

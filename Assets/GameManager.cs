@@ -2,9 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Reflection;
 using TMPro;
 using Unity.Mathematics;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -73,35 +75,92 @@ public class GameManager : MonoBehaviour
 	[SerializeField] GameObject NPCPrefab;
 	[SerializeField] GameObject ActiveNPC;
 	[SerializeField] NPCScript NPCScript;
-	[SerializeField] List<GameObject> PossibleNPCs = new List<GameObject>();
-
-
+	[SerializeField] List<GameObject> NPCsQueue = new List<GameObject>();
+	//I need a queue for the 
+	//NPC index
 
 	//IndividualNPCS
 	public GameObject CurrentNPC;
 	[SerializeField] GameObject TutorialMan;
+	[SerializeField] GameObject Romeo;
+	//
+	//
+	//
+	//
 
 	#endregion
 
 	#region Body Parts
 	[SerializeField] GameObject BodyPartPrefab;
+	public int BodyScore;
+
+	[SerializeField] int Type1PartScore;
+	[SerializeField] int Type2PartScore;
+	[SerializeField] int Type3PartScore;
+
+	public enum BodyPart { Head, Arms, Torso, Legs}
+	public BodyPart SelectedPart;
+
+	//Sprites
+	[SerializeField] Sprite Type1Tombstone;
+	[SerializeField] Sprite Type2Tombstone; 
+	[SerializeField] Sprite Type3Tombstone;
+	public Sprite Type1Head;
+	public Sprite Type1Torso;
+	public Sprite Type1RightArm;
+	public Sprite Type1LeftArm;
+	public Sprite Type1RightLeg;
+	public Sprite Type1LeftLeg;
+	public Sprite Type2Head;
+	public Sprite Type2Torso;
+	public Sprite Type2RightArm;
+	public Sprite Type2LeftArm;
+	public Sprite Type2RightLeg;
+	public Sprite Type2LeftLeg;
+	public Sprite Type3Head;
+	public Sprite Type3Torso;
+	public Sprite Type3RightArm;
+	public Sprite Type3LeftArm;
+	public Sprite Type3RightLeg;
+	public Sprite Type3LeftLeg;
+
+	bool hasHead;
+	bool hasTorso;
+	bool hasArms;
+	bool hasLegs;
+
+	//Lists
+	List<GameObject> AllGraves = new List<GameObject>();
+	List<GameObject> Type1Graves = new List<GameObject>();
+	List<GameObject> Type2Graves = new List<GameObject>();
+	List<GameObject> Type3Graves = new List<GameObject>();
 	#endregion
 
 	[SerializeField] enum programState {Title, MainGame}
 	[SerializeField] programState currentProgramState;
 
+	#region Audio
 	//This is the point where i've accepted my italian heritage and I'm cooking spaghetti
 	public AudioSource AudioManager;
-	//public AudioSource SFXManager;
+	
 
 	//sounds
 	[SerializeField] AudioClip MainMusic;
 	public AudioClip DigNoise;
+	#endregion
+
+	//summon trigger
+	bool summoningActive;
+	[SerializeField] Sprite activeSummoningSprite;
+	[SerializeField] Sprite inactiveSummoningSprite;
 	
+
 	[SerializeField]Sprite PHsprite;
 
 
 	public List<GameObject> NPCS= new List<GameObject>();
+
+
 
 	//Scene Set Ups
 	bool NPCToIntroduce = true;
@@ -131,6 +190,7 @@ public class GameManager : MonoBehaviour
 	{	
 		ProgramLoop();
 		TicLoop();
+		//Loss Check
 	}
 
 	void ProgramLoop()
@@ -159,16 +219,19 @@ public class GameManager : MonoBehaviour
 
 				//player
 				playerController.PokemonController();
-
-
-				//UI
-				//UIManagerScript.UpdateTimer(MinutesRemaining, SecondsRemaining);
-				//UIManagerScript.UpdateTextBox(textManager.CurrentText);
-
-				if (lostGame == true)
+				
+				if(player.transform.position == activeSummonSpawn.transform.position && summoningActive == true)
 				{
-					//Lose Game
+					//Circle Checck
+					//Deliver body
+					//BodyScore = 0;
+					//Add Time
+					//UIManagerScript.UpdateUIEachSecond(MinutesRemaining,SecondsRemaining);	//Update Clock
+					//Introduce next
+					//Wait for circle text
+					Debug.Log("You are in an active circle");
 				}
+
 
 				//testing
 				if (Input.GetKeyDown(KeyCode.Escape))
@@ -202,8 +265,20 @@ public class GameManager : MonoBehaviour
 				GameTimer();
 			}
 			
-			//Tic Specific Actions
-
+			//Tic Specific Action
+			//PlayerTic Actions
+			if (player != null)
+			{
+				playerController.PlayerTicActions();
+			}
+			
+			//Summoning Animation
+			if(BodyScore > 0 && summoningActive == false)
+			{
+				summoningActive = true; //summoning active
+				SpriteRenderer aSSSR =  activeSummonSpawn.GetComponent<SpriteRenderer>();
+				aSSSR.sprite = activeSummoningSprite;
+			}
 
 			//UI
 			UIManagerScript.UpdateUIEachSecond(MinutesRemaining,SecondsRemaining);
@@ -315,6 +390,7 @@ public class GameManager : MonoBehaviour
 		mapPNG = Resources.Load<Texture2D>("Maps/testMap");	//Grab the provincemap
 		MapTiles = new GameObject[mapPNG.width,mapPNG.height];
 
+
 		for (int y = 0; y < mapPNG.height;y++)
 		{
 			for (int x = 0; x < mapPNG.width; x++)
@@ -326,8 +402,8 @@ public class GameManager : MonoBehaviour
 				newTile.name = $"Tile{x}.{y}";
 			}
 		}
-		activeSummonSpawn = spawns[UnityEngine.Random.Range(0, spawns.Count)];//pick the first spawn loaction
-															  //Set up the body locations
+		activeSummonSpawn = spawns[UnityEngine.Random.Range(0, spawns.Count)];	//pick the first spawn loaction
+		GraveGeneration();														//Set up the body locations
 		Debug.Log($"Map Initialization ended at:{DateTime.Now}");
 		gameMap.SetActive(false);       //set the map to inactive
 	}
@@ -351,7 +427,7 @@ public class GameManager : MonoBehaviour
 		else if(r == 64 && g == 64 && b == 64)
 		{
 			newGameObject = Instantiate(GraveObject, new Vector3(x, y), Quaternion.identity, gameMap.transform);	//Graves
-			graves.Add(newGameObject);
+			AllGraves.Add(newGameObject);
 			tileScript.Walkable = true;
 			tileScript.ObjectOnTile = newGameObject;
 		}
@@ -367,13 +443,64 @@ public class GameManager : MonoBehaviour
 			newGameObject = Instantiate(TombstoneObject, new Vector3(x, y), Quaternion.identity, gameMap.transform);    //Graves
 			tileScript.Walkable = false;
 			tileScript.ObjectOnTile = newGameObject;
-			//random tombstones?
+			TileScript ts = MapTiles[x,y-1].GetComponent<TileScript>();    //link to nearby grave
+			GraveScript gs = ts.ObjectOnTile.GetComponent<GraveScript>();
+			gs.Tombstone = newGameObject;
 		}
 		else
 		{
 			tileScript.Walkable = true;
 		}
 		
+		
+		
+	}
+
+	void GraveGeneration()
+	{
+		int totalGraves = AllGraves.Count;
+		Debug.Log($"Total Graves:{totalGraves}");
+		//Body randomization
+		while(Type1Graves.Count < (int)(totalGraves * .5))
+		{
+			int index = UnityEngine.Random.Range(0, AllGraves.Count - 1);
+			GameObject grave = AllGraves[index];
+			Type1Graves.Add(grave);
+			AllGraves.Remove(grave);
+			GraveScript gs = grave.GetComponent<GraveScript>();
+			SpriteRenderer tombstone = gs.Tombstone.GetComponent<SpriteRenderer>();
+			tombstone.sprite = Type1Tombstone;
+			gs.Type = GraveScript.GraveType.Type1; //body instantiation
+			
+		}
+		Debug.Log($"Type1 Graves:{Type1Graves.Count}");
+		while (Type2Graves.Count < (int)(totalGraves*.35))
+		{
+			int index = UnityEngine.Random.Range(0, AllGraves.Count - 1);
+			GameObject grave = AllGraves[index];
+			Type2Graves.Add(grave);
+			AllGraves.Remove(grave);
+			GraveScript gs = grave.GetComponent<GraveScript>();
+			SpriteRenderer tombstone = gs.Tombstone.GetComponent<SpriteRenderer>();
+			tombstone.sprite = Type2Tombstone;
+			gs.Type = GraveScript.GraveType.Type2; //body instantiation
+		}
+		Debug.Log($"Type2 Graves:{Type2Graves.Count}");
+		int remainingGraves = AllGraves.Count;
+		Debug.Log(remainingGraves);
+		while (Type3Graves.Count < remainingGraves)
+		{
+			int index = 0;
+			GameObject grave = AllGraves[index];
+			Type3Graves.Add(grave);
+			AllGraves.Remove(grave);
+			GraveScript gs = grave.GetComponent<GraveScript>();
+			SpriteRenderer tombstone = gs.Tombstone.GetComponent<SpriteRenderer>();
+			tombstone.sprite = Type3Tombstone;
+			gs.Type = GraveScript.GraveType.Type3; //body instantiation
+			index ++;	
+		}
+		Debug.Log($"Type3 Graves:{Type3Graves.Count}");
 	}
 	#endregion
 
@@ -441,4 +568,75 @@ public class GameManager : MonoBehaviour
 	}
 
 	#endregion
+	#region BodySpecific
+	void ClearBody()
+	{
+		hasHead= false;
+		hasTorso= false;
+		hasLegs= false;
+		hasArms= false;
+		BodyScore = 0;
+		UIManagerScript.UIBodyClear();
+	}
+
+	public void PullBody(GraveScript gs)
+	{
+		bool partReceived = false;
+		//Check
+		while (partReceived == false)
+		{
+			int dieRoll = UnityEngine.Random.Range(1,4);
+			Debug.Log(dieRoll);
+			if (hasHead == false && dieRoll == 1)
+			{
+				hasHead = true;
+				UIManagerScript.UIAddPart(BodyPart.Head, gs.Type);
+				partReceived = true;
+				Debug.Log("Got a head!");
+			}
+			else if (hasTorso == false && dieRoll == 2)
+			{
+				hasTorso = true;
+				UIManagerScript.UIAddPart(BodyPart.Torso, gs.Type);
+				partReceived = true;
+				Debug.Log("Got a torso!");
+			}
+			else if(hasArms == false && dieRoll == 3)
+			{
+				hasArms = true;
+				UIManagerScript.UIAddPart(BodyPart.Arms, gs.Type);
+				partReceived = true;
+				Debug.Log("Got arms");
+			}
+			else if(hasLegs == false && dieRoll == 3)
+			{
+				//legs
+				hasLegs = true;
+				UIManagerScript.UIAddPart(BodyPart.Legs, gs.Type);
+				partReceived = true;
+				Debug.Log("Got Legs!");
+			}
+		}
+		CalculatePartScore(gs.Type);	//calculate score
+		
+
+	}
+
+	void CalculatePartScore(GraveScript.GraveType Type)
+	{
+		switch(Type)
+		{
+			case(GraveScript.GraveType.Type1):
+				BodyScore += Type1PartScore;
+				break;
+			case (GraveScript.GraveType.Type2):
+				BodyScore += Type2PartScore;
+				break;
+			case (GraveScript.GraveType.Type3):
+				BodyScore += Type3PartScore;
+				break;
+		}
+	}
+
+	#endregion 
 }

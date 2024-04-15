@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour
 	public bool CanMove = false;
 	[SerializeField] int secondsToDig = 3;
 	[SerializeField] int digCompletionTime;
+	[SerializeField] GameObject Grave;
 	[SerializeField] GraveScript GraveTarget;
 
 	//Sprites
@@ -114,16 +115,7 @@ public class PlayerController : MonoBehaviour
 			}
 			else if (digging == true)
 			{
-				if(GameManager.TotalGameSeconds >= digCompletionTime)
-				{
-					digging= false;
-					GraveTarget.iveBeenDug();
-				}
-				else
-				{
-					//GameManager.SFXManager.PlayOneShot(GameManager.DigNoise);	//play dig sound
-					//play dig animation
-				}				
+				
 			}
 		}
 
@@ -131,7 +123,20 @@ public class PlayerController : MonoBehaviour
 
 	public void PlayerTicActions()
 	{
-
+		if (GameManager.TotalGameSeconds >= digCompletionTime && digging == true)
+		{
+			digging = false;
+			GraveTarget.iveBeenDug();
+			GameManager.PullBody(GraveTarget);
+			//TEST
+			//GameManager.BodyScore += 1;
+			//CanMove = true;
+		}
+		else
+		{
+			//GameManager.SFXManager.PlayOneShot(GameManager.DigNoise);	//play dig sound
+			//play dig animation
+		}
 	}
 	
 	TileScript checkTile(Vector2 CheckedVector)
