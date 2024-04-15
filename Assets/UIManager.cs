@@ -14,6 +14,7 @@ using static System.Net.Mime.MediaTypeNames;
 /// 
 public class UIManager : MonoBehaviour
 {
+	public bool coroutineRunning;
 	[SerializeField] TMP_Text timerText;
 	[SerializeField] TMP_Text textBox;
 	[SerializeField] UnityEngine.UI.Image textImage;
@@ -21,7 +22,7 @@ public class UIManager : MonoBehaviour
 	[SerializeField] string CurrentText;
 	//bool longformText = false;
 
-	[SerializeField] int textEndSec;
+	public int textEndSec;
 	bool textSkippable = false;
 	bool textPresent = false;
 
@@ -36,7 +37,7 @@ public class UIManager : MonoBehaviour
 	float coroutineSpeed;
 	bool coroutineTimer;
 
-	[SerializeField] GameObject TitleScreenItems;
+	public GameObject TitleScreenItems;
 	[SerializeField] GameObject MainGameItems;
 
 	#region BodyItems
@@ -56,6 +57,7 @@ public class UIManager : MonoBehaviour
 	#endregion
 
 	public bool TextAccepted = false;
+	public int textEndTime;
 
 	private void Awake()
 	{
@@ -127,19 +129,19 @@ public class UIManager : MonoBehaviour
 		textQueue = LinesToWrite;
 		textBox.text = textQueue[0];
 	}
-	/*
-	public void BasicTextWriter(GameObject Speaker, Sprite SpeakerSprite, string LineToWrite)
+
+	public void BasicTextWriter(GameObject Speaker, Sprite SpeakerSprite, List<string> LinesToWrite, int LongerTextLinger)
 	{
 		CurrentSpeaker = Speaker;
 		CurrentSprite = SpeakerSprite;
-		textImage.sprite = Speaker.GetComponent<Sprite>();   //Set the image
+		textImage.sprite = SpeakerSprite;
 		TextImageObject.SetActive(true);
 		textQueue.Clear();
-		textEndSec = gameManager.TotalGameSeconds + TextLinger;
-		textQueue.Add(LineToWrite);
-		textBox.text = LineToWrite;
+		textEndSec = gameManager.TotalGameSeconds + LongerTextLinger;
+		textQueue = LinesToWrite;
+		textBox.text = textQueue[0];
 	}
-	*/
+
 	public void BasicTextWriter( string LineToWrite)
 	{
 		textEndSec = gameManager.TotalGameSeconds + TextLinger;
@@ -242,33 +244,16 @@ public class UIManager : MonoBehaviour
 	public void UpdateUIEachSecond(int Minutes, int Seconds)
 	{
 		//Timer
-		UpdateTimer(Minutes,Seconds);
-		
-		//Text
-		if (gameManager.TotalGameSeconds >= textEndSec && textQueue.Count > 0)
+		//UpdateTimer(Minutes,Seconds);
+		if(coroutineRunning == true)
 		{
-			Debug.Log(textQueue[0]);
-			textQueue.Remove(textQueue[0]);
-			if(textQueue.Count > 0)
-			{
-				BasicTextWriter(textQueue[0]);
-			}
-			else
-			{
-				TextAccepted = false;
-				TextImageObject.SetActive(false);//deactivate image
-				textBox.text = "";  //blank text
-				//Tell the game its down
-				if(gameManager.timerActive == false)
-				{
-					gameManager.timerActive = true;
-				}
-				if(gameManager.playerController.CanMove == false)
-				{
-					gameManager.playerController.CanMove =true;
-				}
-			}
+			//nothing
 		}
+		else
+		{
+			textBox.text = CorrectTime(Minutes, Seconds) + " Remaining";
+		}
+
 	}
 
 
@@ -287,5 +272,66 @@ public class UIManager : MonoBehaviour
 		{
 			timerText.text = $"{Minutes}:{Seconds}";
 		}
+	}
+
+	string CorrectTime(int Minutes, int Seconds)
+	{
+		if (Seconds < 10 && Seconds > 0)
+		{
+			return $"{Minutes}:0{Seconds}";
+		}
+		else if (Seconds == 0)
+		{
+			return $"{Minutes}:0{Seconds}";//May not be needed. We will see in a moment
+		}
+		else
+		{
+			return $"{Minutes}:{Seconds}";
+		}
+	}
+	public IEnumerator DisplayText(GameObject Speaker, Sprite SpeakerSprite, List<string> StringsToList)
+	{
+		coroutineRunning = true;
+		CurrentSpeaker = Speaker;
+		CurrentSprite = SpeakerSprite;
+		textImage.sprite = SpeakerSprite;
+		TextImageObject.SetActive(true);
+		Debug.Log("I'm running");
+		foreach (string l in StringsToList)
+		{
+			textBox.text = l;
+			yield return new WaitForSeconds(TextLinger);
+			Debug.Log(l);
+		}
+		gameManager.timerActive= true;
+		gameManager.playerController.CanMove = true;
+		TextAccepted = false;
+		TextImageObject.SetActive(false);
+		coroutineRunning = false;
+		//move to next item
+	}
+
+	public IEnumerator DisplayEndText(GameObject Speaker, Sprite SpeakerSprite, List<string> StringsToList)
+	{
+		coroutineRunning = true;
+		gameManager.AudioManager.clip = gameManager.EndMusic;
+		gameManager.AudioManager.Play();
+		CurrentSpeaker = Speaker;
+		CurrentSprite = SpeakerSprite;
+		textImage.sprite = SpeakerSprite;
+		TextImageObject.SetActive(true);
+		Debug.Log("I'm running");
+		foreach (string l in StringsToList)
+		{
+			textBox.text = l;
+			yield return new WaitForSeconds(TextLinger);
+			Debug.Log(l);
+		}
+		gameManager.timerActive = true;
+		gameManager.playerController.CanMove = true;
+		TextAccepted = false;
+		TextImageObject.SetActive(false);
+		coroutineRunning = false;
+		gameManager.ReturnToTitle();
 	}
 }

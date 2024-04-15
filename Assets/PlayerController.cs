@@ -84,20 +84,25 @@ public class PlayerController : MonoBehaviour
 				TileScript ts = checkTile(transform.position).GetComponent<TileScript>();
 				if (ts.ObjectOnTile.tag == "Grave")
 				{
+					if (GameManager.hasHead == false || GameManager.hasTorso == false || GameManager.hasArms == false || GameManager.hasLegs == false)
+					{
+						GraveTarget = ts.ObjectOnTile.GetComponent<GraveScript>();
+						if (GraveTarget.isDiggable == true)
+						{
+							digCompletionTime = (int)GameManager.TotalGameSeconds + secondsToDig;
+							digging = true;
+							GameManager.PlayDigNoise();
+							//GameManager.AudioManager.PlayOneShot(GameManager.DigNoise);   //play dig sound
+							//Start animation
+						}
 
-					GraveTarget = ts.ObjectOnTile.GetComponent<GraveScript>();
-					if(GraveTarget.isDiggable == true)
-					{
-						digCompletionTime = (int)GameManager.TotalGameSeconds + secondsToDig;
-						digging= true;
-						GameManager.AudioManager.PlayOneShot(GameManager.DigNoise);   //play dig sound
-						//Start animation
+						else
+						{
+							//Theres nothing left!
+						}
 					}
+
 					
-					else
-					{
-						//Theres nothing left!
-					}
 				}
 			}
 		}

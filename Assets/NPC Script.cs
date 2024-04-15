@@ -11,4 +11,5 @@ public class NPCScript : MonoBehaviour
 	public bool IsSpeaking;
 	public bool IsAccepted;
 	public bool IsIntroduced;
+	public List<string> Failure = new List<string>();
 }

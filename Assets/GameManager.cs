@@ -21,6 +21,7 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
 	bool lostGame = false;
+	public int EndTime;
 
 	#region ChildObjects and their Scripts
 	[SerializeField] GameObject GameManger;	
@@ -28,7 +29,8 @@ public class GameManager : MonoBehaviour
 	[SerializeField] GameObject UIManager;  //Added in inspector
 
 	[SerializeField] UIManager UIManagerScript;
-	
+	public AudioClip EndMuisic;
+
 	#endregion
 
 	#region Timer Items
@@ -125,10 +127,10 @@ public class GameManager : MonoBehaviour
 	public Sprite Type3RightLeg;
 	public Sprite Type3LeftLeg;
 
-	bool hasHead;
-	bool hasTorso;
-	bool hasArms;
-	bool hasLegs;
+	public bool hasHead;
+	public bool hasTorso;
+	public bool hasArms;
+	public bool hasLegs;
 
 	//Lists
 	List<GameObject> AllGraves = new List<GameObject>();
@@ -143,11 +145,12 @@ public class GameManager : MonoBehaviour
 	#region Audio
 	//This is the point where i've accepted my italian heritage and I'm cooking spaghetti
 	public AudioSource AudioManager;
+	public AudioClip EndMusic;
 	
 
 	//sounds
-	[SerializeField] AudioClip MainMusic;
-	public AudioClip DigNoise;
+	public AudioClip MainMusic;
+	public List<AudioClip> DigNoises;
 	#endregion
 
 	//summon trigger
@@ -177,6 +180,8 @@ public class GameManager : MonoBehaviour
 		MapGenerated= false;
 		UIManagerScript.UIMode();
 		Time.timeScale = 1;
+		UIManagerScript.TitleScreenItems.transform.position =new Vector2(GameCamera.transform.position.x,GameCamera.transform.position.y);
+
 	}
 
 
@@ -193,6 +198,7 @@ public class GameManager : MonoBehaviour
 	{	
 		ProgramLoop();
 		TicLoop();
+		//
 		//Loss Check
 	}
 
@@ -211,18 +217,6 @@ public class GameManager : MonoBehaviour
 
 				//player
 				playerController.PokemonController();
-				
-				
-
-
-				//testing
-				if (Input.GetKeyDown(KeyCode.Escape))
-				{
-					ReturnToTitle();
-					//invoke the failed state
-					//load the title
-				}
-
 				break;
 
 
@@ -255,7 +249,7 @@ public class GameManager : MonoBehaviour
 			}
 			
 			//Summoning Animation
-			if(BodyScore >= 4 && summoningActive == false)
+			if(hasHead == true && hasTorso == true && hasArms == true && hasLegs == true && summoningActive == false)
 			{
 				summoningActive = true; //summoning active
 				SpriteRenderer aSSSR =  activeSummonSpawn.GetComponent<SpriteRenderer>();
@@ -273,6 +267,48 @@ public class GameManager : MonoBehaviour
 			}
 			UIManagerScript.UpdateUIEachSecond(MinutesRemaining,SecondsRemaining);
 			
+			//lose
+			if(timerActive == true && MinutesRemaining == 0 && SecondsRemaining == 0)
+			{
+				NPCScript NPCS = CurrentNPC.GetComponent<NPCScript>();
+				StartCoroutine(UIManagerScript.DisplayEndText(CurrentNPC,NPCS.NPCSprite, NPCS.Failure));
+				
+				
+				//NPCScript NPCS = CurrentNPC.GetComponent<NPCScript>();
+				//NPCSpeaking(CurrentNPC, NPCS.Failure, 3, true);
+				//if(UIManagerScript.textQueue.Count == 0)
+				//{
+				
+				//}
+				/*
+				if(lostGame == false)
+				{
+					EndTime = TotalGameSeconds + 6;
+				}
+				lostGame = true;
+				
+				if(EndTime<= TotalGameSeconds)
+				{
+					ReturnToTitle();
+				
+				if (UIManagerScript.TextAccepted == false)
+				{
+					EndTime = TotalGameSeconds + 6;
+				}
+				else
+				{
+					timerActive = false;
+					//play failure
+					//play music
+					NPCScript NPCS = CurrentNPC.GetComponent<NPCScript>();
+					NPCSpeaking(CurrentNPC,NPCS.Failure, 3, true);
+				}*/
+			}
+				
+
+				
+				
+		}
 
 			//The below is crunchtime, this should be a method
 			if (MinutesRemaining == 0 && SecondsRemaining <= 30 && crunchTime == false)
@@ -283,8 +319,8 @@ public class GameManager : MonoBehaviour
 			{
 				crunchTime = false;
 			}
-		}
 	}
+
 
 	void GameTimer()
 	{
@@ -309,16 +345,15 @@ public class GameManager : MonoBehaviour
 			MapGenerated = true;
 		}
 		
-		//for the start it will linger until the player presses "enter" or "return"
-		if(Input.GetKeyDown(KeyCode.Return)||Input.GetKeyDown(KeyCode.KeypadEnter))
+		
+		if(Input.GetKeyDown(KeyCode.Space))
 		{
 			NewGame();	//Load the next scene
 		}
 	}
 
-	void titleSetUp()
+	public void titleSetUp()
 	{
-		MapGenerated= false;
 
 		//testing deleting the map
 		for (int y = 0; y < MapTiles.GetLength(1); y++)
@@ -328,8 +363,13 @@ public class GameManager : MonoBehaviour
 				Destroy(MapTiles[x,y]);
 			}
 		}
+		UIManagerScript.UIMode();
+		UIManagerScript.TitleScreenItems.transform.position = new Vector2(GameCamera.transform.position.x, GameCamera.transform.position.y);
+		MapGenerated = false;
+		player.SetActive(false);
 		//Start playing title music?
-
+		AudioManager.clip= MainMusic;
+		AudioManager.Play();
 	}
 
 	#endregion
@@ -364,7 +404,7 @@ public class GameManager : MonoBehaviour
 		CurrentNPC = NPCsQueue[NPCIndex];
 		//Introduce NPC
 		NPCScript npcS= TutorialMan.GetComponent<NPCScript>();
-		IntroduceNextNPC();
+		StartCoroutine(UIManagerScript.DisplayText(CurrentNPC,npcS.NPCSprite,npcS.IntroductionLines));
 	}
 
 	//Follows the player
@@ -561,15 +601,15 @@ public class GameManager : MonoBehaviour
 		ClearBody();
 		//Acceptance
 		//if good (only good)
-		CurrentNPC = NPCsQueue[NPCIndex];
+		//CurrentNPC = NPCsQueue[NPCIndex];
 		NPCScript NPCS = CurrentNPC.GetComponent<NPCScript>();
-		//if(NPCS.IsSpeaking == false){ }
-		NPCSpeaking(CurrentNPC, NPCS.GoodAcceptance);
-		//if bad
-		//move to next
-		//IntroduceNextNPC();
-		//IsIntroduced = false;//?
+		StartCoroutine(UIManagerScript.DisplayText(CurrentNPC,NPCS.NPCSprite, NPCS.GoodAcceptance));
+		summoningActive = false;
+		SpriteRenderer SR = activeSummonSpawn.GetComponent<SpriteRenderer>();
+		SR.sprite = inactiveSummoningSprite;
+		
 	}
+	
 	
 
 	//Introduction
@@ -584,14 +624,34 @@ public class GameManager : MonoBehaviour
 
 	#region Text Specific
 
-	void NPCSpeaking(GameObject NPC, List<string>TextToAdd)
+	void NPCSpeaking(GameObject NPC, List<string>TextToAdd, int TimeOverRide, bool LongerTime = false)
 	{
 
 		NPCScript NPCS = NPC.GetComponent<NPCScript>();
 		if(UIManagerScript.TextAccepted == false)
 		{
-			UIManagerScript.BasicTextWriter(NPC, NPCS.NPCSprite, TextToAdd);
+			if(LongerTime == true)
+			{
+				UIManagerScript.BasicTextWriter(NPC, NPCS.NPCSprite, TextToAdd, TimeOverRide);
+			}
+			else
+			{
+				UIManagerScript.BasicTextWriter(NPC, NPCS.NPCSprite, TextToAdd);
+			}
 		}
+
+	}
+	void NPCSpeaking(GameObject NPC, List<string> TextToAdd)
+	{
+
+		NPCScript NPCS = NPC.GetComponent<NPCScript>();
+		if (UIManagerScript.TextAccepted == false)
+		{
+			
+				UIManagerScript.BasicTextWriter(NPC, NPCS.NPCSprite, TextToAdd);
+			
+		}
+
 	}
 
 
@@ -610,41 +670,37 @@ public class GameManager : MonoBehaviour
 	public void PullBody(GraveScript gs)
 	{
 		bool partReceived = false;
-		//Check
-		while (partReceived == false)
+		if (hasHead == false)
 		{
-			int dieRoll = UnityEngine.Random.Range(1,4);
-			Debug.Log(dieRoll);
-			if (hasHead == false && dieRoll == 1)
-			{
 				hasHead = true;
 				UIManagerScript.UIAddPart(BodyPart.Head, gs.Type);
 				partReceived = true;
 				Debug.Log("Got a head!");
-			}
-			else if (hasTorso == false && dieRoll == 2)
-			{
-				hasTorso = true;
-				UIManagerScript.UIAddPart(BodyPart.Torso, gs.Type);
+		}
+		else if (hasTorso == false)
+		{
+			hasTorso = true;
+			UIManagerScript.UIAddPart(BodyPart.Torso, gs.Type);
 				partReceived = true;
 				Debug.Log("Got a torso!");
-			}
-			else if(hasArms == false && dieRoll == 3)
-			{
+		}
+		else if(hasArms == false)
+		{
 				hasArms = true;
 				UIManagerScript.UIAddPart(BodyPart.Arms, gs.Type);
 				partReceived = true;
 				Debug.Log("Got arms");
-			}
-			else if(hasLegs == false && dieRoll == 3)
-			{
-				//legs
-				hasLegs = true;
-				UIManagerScript.UIAddPart(BodyPart.Legs, gs.Type);
-				partReceived = true;
-				Debug.Log("Got Legs!");
-			}
 		}
+		else if(hasLegs == false)
+		{
+			//legs
+			hasLegs = true;
+			UIManagerScript.UIAddPart(BodyPart.Legs, gs.Type);
+			partReceived = true;
+			Debug.Log("Got Legs!");
+		}
+			
+		
 		CalculatePartScore(gs.Type);	//calculate score
 		
 
@@ -667,4 +723,11 @@ public class GameManager : MonoBehaviour
 	}
 
 	#endregion 
+
+	public void PlayDigNoise()
+	{
+		int i = UnityEngine.Random.Range(0,DigNoises.Count-1);
+		AudioManager.PlayOneShot(DigNoises[i]);
+	}
+
 }
