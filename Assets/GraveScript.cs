@@ -4,15 +4,16 @@ using UnityEngine;
 
 public class GraveScript : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+	//Body parts present
+	public bool isDiggable = true;
+	[SerializeField] Sprite DugSprite;
+	[SerializeField] SpriteRenderer SR;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	public void iveBeenDug()
+	{
+		isDiggable= false;
+		SR.sprite = DugSprite;
+		//body parts destroyed?
+	}
+
 }

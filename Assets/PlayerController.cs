@@ -14,6 +14,11 @@ public class PlayerController : MonoBehaviour
 						//interaction field?
 	
 	bool moving = false;
+	bool digging = false;
+	public bool CanMove = false;
+	[SerializeField] int secondsToDig = 3;
+	[SerializeField] int digCompletionTime;
+	[SerializeField] GraveScript GraveTarget;
 
 	//Sprites
 	[SerializeField] SpriteRenderer playerSprite;
@@ -24,19 +29,21 @@ public class PlayerController : MonoBehaviour
 
 	//
 	[SerializeField] Vector2 target;
+
+	//Pokemon Controller is a once per frame not tic
 	public void PokemonController()
 	{
 		float step = speed * Time.deltaTime;
 		
 
-		if(moving == false)
+		if(moving == false && digging == false && CanMove == true)
 		{
 			if (Input.GetKey(KeyCode.W))
 			{
 				target = new Vector2(transform.position.x, transform.position.y + 1);
 				playerFacing = PlayerFacing.Up;
 				playerSprite.sprite = UpSprite;
-				if(CheckCollision(target) == false)
+				if(checkTile(target).Walkable == true)
 				{
 					moving = true;
 				}
@@ -46,7 +53,7 @@ public class PlayerController : MonoBehaviour
 				target = new Vector2(transform.position.x + 1, transform.position.y);
 				playerFacing = PlayerFacing.Right;
 				playerSprite.sprite = RightSprite;
-				if (CheckCollision(target) == false)
+				if (checkTile(target).Walkable == true)
 				{
 					moving = true;
 				}
@@ -56,7 +63,7 @@ public class PlayerController : MonoBehaviour
 				target = new Vector2(transform.position.x, transform.position.y - 1);
 				playerFacing = PlayerFacing.Down;
 				playerSprite.sprite = DownSprite;
-				if (CheckCollision(target) == false)
+				if (checkTile(target).Walkable == true)
 				{
 					moving = true;
 				}
@@ -66,63 +73,73 @@ public class PlayerController : MonoBehaviour
 				target = new Vector2(transform.position.x - 1, transform.position.y);
 				playerFacing = PlayerFacing.Left;
 				playerSprite.sprite = LeftSprite;
-				if (CheckCollision(target) == false)
+				if (checkTile(target).Walkable == true)
 				{
 					moving = true;
+				}
+			}
+			else if(Input.GetKeyDown(KeyCode.Space))
+			{
+				TileScript ts = checkTile(transform.position).GetComponent<TileScript>();
+				if (ts.ObjectOnTile.tag == "Grave")
+				{
+
+					GraveTarget = ts.ObjectOnTile.GetComponent<GraveScript>();
+					if(GraveTarget.isDiggable == true)
+					{
+						digCompletionTime = (int)GameManager.TotalGameSeconds + secondsToDig;
+						digging= true;
+						GameManager.AudioManager.PlayOneShot(GameManager.DigNoise);   //play dig sound
+						//Start animation
+					}
+					
+					else
+					{
+						//Theres nothing left!
+					}
 				}
 			}
 		}
 		else
 		{
-			transform.position = Vector2.MoveTowards(transform.position, target, step);
-			//walk
-			if (transform.position.x == target.x && transform.position.y == target.y)
+			if (moving== true)
 			{
-				moving = false;
-				
+				transform.position = Vector2.MoveTowards(transform.position, target, step);
+				//walk
+				if (transform.position.x == target.x && transform.position.y == target.y)
+				{
+					moving = false;
+
+				}
 			}
-			
+			else if (digging == true)
+			{
+				if(GameManager.TotalGameSeconds >= digCompletionTime)
+				{
+					digging= false;
+					GraveTarget.iveBeenDug();
+				}
+				else
+				{
+					//GameManager.SFXManager.PlayOneShot(GameManager.DigNoise);	//play dig sound
+					//play dig animation
+				}				
+			}
 		}
-		/*
-		//Facing
-		//This is a dogshit way of handling this
-		switch (playerFacing)
-		{
-			case PlayerFacing.Up:
-				playerSprite.sprite = UpSprite;
-				break;
-			case PlayerFacing.Down:
-				playerSprite.sprite = DownSprite;
-				break;
-			case PlayerFacing.Left:
-				playerSprite.sprite = LeftSprite;
-				break;
-			case PlayerFacing.Right:
-				playerSprite.sprite = RightSprite;
-				break;
-		}
-		*/
+
+	}
+
+	public void PlayerTicActions()
+	{
+
 	}
 	
-	bool CheckCollision(Vector2 CheckedVector)
+	TileScript checkTile(Vector2 CheckedVector)
 	{
 		int x = (int)CheckedVector.x;
 		int y = (int)CheckedVector.y;
 		TileScript tile = GameManager.MapTiles[x, y].GetComponent<TileScript>();
-		return tile.Walkable;
-
-	}
-
-	//The dig thing
-	void Interaction()
-	{
-		//Should take a specific amount of time to up the tension
-		//throw a interaction thing in front and a progress bar in front of the player?
-		//if collided object is a grave
-			//DIG
-			//after digging select body parts
-		//If collided objec is an npc
-			//talk/end task
+		return tile;
 	}
 
 	
