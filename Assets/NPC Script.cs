@@ -6,6 +6,9 @@ public class NPCScript : MonoBehaviour
 {
 	public Sprite NPCSprite;
 	public List<string> IntroductionLines= new List<string>();
+	public List<string> GoodAcceptance = new List<string>();
 	public string NPCName;
-	public bool Introduced;
+	public bool IsSpeaking;
+	public bool IsAccepted;
+	public bool IsIntroduced;
 }

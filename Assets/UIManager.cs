@@ -55,6 +55,7 @@ public class UIManager : MonoBehaviour
 
 	#endregion
 
+	public bool TextAccepted = false;
 
 	private void Awake()
 	{
@@ -126,6 +127,7 @@ public class UIManager : MonoBehaviour
 		textQueue = LinesToWrite;
 		textBox.text = textQueue[0];
 	}
+	/*
 	public void BasicTextWriter(GameObject Speaker, Sprite SpeakerSprite, string LineToWrite)
 	{
 		CurrentSpeaker = Speaker;
@@ -137,6 +139,7 @@ public class UIManager : MonoBehaviour
 		textQueue.Add(LineToWrite);
 		textBox.text = LineToWrite;
 	}
+	*/
 	public void BasicTextWriter( string LineToWrite)
 	{
 		textEndSec = gameManager.TotalGameSeconds + TextLinger;
@@ -252,8 +255,18 @@ public class UIManager : MonoBehaviour
 			}
 			else
 			{
+				TextAccepted = false;
 				TextImageObject.SetActive(false);//deactivate image
 				textBox.text = "";  //blank text
+				//Tell the game its down
+				if(gameManager.timerActive == false)
+				{
+					gameManager.timerActive = true;
+				}
+				if(gameManager.playerController.CanMove == false)
+				{
+					gameManager.playerController.CanMove =true;
+				}
 			}
 		}
 	}

@@ -10,6 +10,7 @@ using UnityEditor;
 using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 
 /// <summary>
@@ -38,7 +39,7 @@ public class GameManager : MonoBehaviour
 	[SerializeField] bool crunchTime;           //Added this. Figured I can up the player speed in the last 30 seconds without telling the player.
 												//I just want a slight bump for those last second moments.
 	public int TotalGameSeconds;
-	bool timerActive = false;
+	public bool timerActive = false;
 	#endregion
 
 	#region Map Items
@@ -52,7 +53,7 @@ public class GameManager : MonoBehaviour
 	[SerializeField] List<GameObject> possibleSpawns = new List<GameObject>();
 	[SerializeField] GameObject activeSummonSpawn;
 	[SerializeField] GameObject player;
-	[SerializeField] PlayerController playerController;
+	public PlayerController playerController;
 
 
 	//Tiles
@@ -77,7 +78,7 @@ public class GameManager : MonoBehaviour
 	[SerializeField] NPCScript NPCScript;
 	[SerializeField] List<GameObject> NPCsQueue = new List<GameObject>();
 	//I need a queue for the 
-	//NPC index
+	[SerializeField] int NPCIndex; //NPC index
 
 	//IndividualNPCS
 	public GameObject CurrentNPC;
@@ -163,9 +164,11 @@ public class GameManager : MonoBehaviour
 
 
 	//Scene Set Ups
+	//bool mainGameSet = false;
+	bool IsIntroduced = false;
 	bool NPCToIntroduce = true;
 	//bool mainGameSet = false;
-	bool TextSent = false;	//This is so the introductions work
+	[SerializeField ]bool TextSent = false;	//This is so the introductions work
 
 	//Awake contains the Don't Destroy on Load command. It'll keep this script running the whole time.
 	private void Awake()
@@ -202,35 +205,14 @@ public class GameManager : MonoBehaviour
 				TitlePageScreen();
 				break;
 			case programState.MainGame:
-				if(NPCToIntroduce == true)	//new NPC?
-				{
-					timerActive = false;
-					playerController.CanMove = false;
-					if (UIManagerScript.textQueue.Count == 0 && TextSent == true)
-					{
-						NPCToIntroduce = false;
-						playerController.CanMove = true;
-						timerActive = true;
-					}
-
-				}
+				
 				//MainGameLoop
 				cameraUpdate(); //Move the camera to follow the player
 
 				//player
 				playerController.PokemonController();
 				
-				if(player.transform.position == activeSummonSpawn.transform.position && summoningActive == true)
-				{
-					//Circle Checck
-					//Deliver body
-					//BodyScore = 0;
-					//Add Time
-					//UIManagerScript.UpdateUIEachSecond(MinutesRemaining,SecondsRemaining);	//Update Clock
-					//Introduce next
-					//Wait for circle text
-					Debug.Log("You are in an active circle");
-				}
+				
 
 
 				//testing
@@ -273,7 +255,7 @@ public class GameManager : MonoBehaviour
 			}
 			
 			//Summoning Animation
-			if(BodyScore > 0 && summoningActive == false)
+			if(BodyScore >= 4 && summoningActive == false)
 			{
 				summoningActive = true; //summoning active
 				SpriteRenderer aSSSR =  activeSummonSpawn.GetComponent<SpriteRenderer>();
@@ -281,9 +263,16 @@ public class GameManager : MonoBehaviour
 			}
 
 			//UI
+			if (player.transform.position == activeSummonSpawn.transform.position && summoningActive == true)
+			{
+				//Circle Checck
+				NPCAcceptance();
+				//Add Time
+				//Wait for circle text
+				Debug.Log("You are in an active circle");
+			}
 			UIManagerScript.UpdateUIEachSecond(MinutesRemaining,SecondsRemaining);
-			//TextUpdate
-
+			
 
 			//The below is crunchtime, this should be a method
 			if (MinutesRemaining == 0 && SecondsRemaining <= 30 && crunchTime == false)
@@ -371,8 +360,11 @@ public class GameManager : MonoBehaviour
 	void MainGameStart()
 	{
 		//animate the spawn
-		CurrentNPC = TutorialMan;
-		IntroduceAnNPC(TutorialMan); //Introduce Tutorial
+		//CurrentNPC = TutorialMan;
+		CurrentNPC = NPCsQueue[NPCIndex];
+		//Introduce NPC
+		NPCScript npcS= TutorialMan.GetComponent<NPCScript>();
+		IntroduceNextNPC();
 	}
 
 	//Follows the player
@@ -389,8 +381,8 @@ public class GameManager : MonoBehaviour
 	{
 		mapPNG = Resources.Load<Texture2D>("Maps/testMap");	//Grab the provincemap
 		MapTiles = new GameObject[mapPNG.width,mapPNG.height];
-
-
+		int xInc = 0;//sprite chunk
+		int yInc = 0;
 		for (int y = 0; y < mapPNG.height;y++)
 		{
 			for (int x = 0; x < mapPNG.width; x++)
@@ -399,6 +391,24 @@ public class GameManager : MonoBehaviour
 				GameObject newTile = Instantiate(Tile, new Vector2(x, y), Quaternion.identity, gameMap.transform);
 				objectInstantiater(thisPixel,x,y, newTile);    //make the tile based on the RGB value
 				MapTiles[x, y] = newTile;
+				
+				if(x == xInc && y == yInc)
+				{
+					xInc += 4;
+					if (xInc > mapPNG.width)
+					{
+						xInc = 0;
+						yInc += 4;
+					}
+
+				}
+				else
+				{
+					SpriteRenderer TS = newTile.GetComponent<SpriteRenderer>();
+					TS.enabled = false;
+				}
+				Debug.Log(xInc);
+
 				newTile.name = $"Tile{x}.{y}";
 			}
 		}
@@ -541,31 +551,49 @@ public class GameManager : MonoBehaviour
 		SetUpMethod();
 	}
 	#endregion
+
+	#region NPC Specific
+
+	//Acceptance
+	void NPCAcceptance()
+	{
+		SecondsRemaining += BodyScore;//add seconds
+		ClearBody();
+		//Acceptance
+		//if good (only good)
+		CurrentNPC = NPCsQueue[NPCIndex];
+		NPCScript NPCS = CurrentNPC.GetComponent<NPCScript>();
+		//if(NPCS.IsSpeaking == false){ }
+		NPCSpeaking(CurrentNPC, NPCS.GoodAcceptance);
+		//if bad
+		//move to next
+		//IntroduceNextNPC();
+		//IsIntroduced = false;//?
+	}
 	
+
+	//Introduction
+	void IntroduceNextNPC()
+	{
+		GameObject NPC = NPCsQueue[NPCIndex];
+		NPCScript NPCS = NPC.GetComponent<NPCScript>();
+		NPCSpeaking(NPC, NPCS.IntroductionLines);
+	}
+
+	#endregion
+
 	#region Text Specific
-	void IntroduceAnNPC(GameObject NPC)
+
+	void NPCSpeaking(GameObject NPC, List<string>TextToAdd)
 	{
 
 		NPCScript NPCS = NPC.GetComponent<NPCScript>();
-		
-		if (UIManagerScript.textQueue.Count == 0 && TextSent == true)
+		if(UIManagerScript.TextAccepted == false)
 		{
-			NPCS.Introduced = true;
-			playerController.CanMove = true;
-			timerActive = true;
+			UIManagerScript.BasicTextWriter(NPC, NPCS.NPCSprite, TextToAdd);
 		}
-		else if(NPCS.Introduced == false)
-		{
-			UIManagerScript.BasicTextWriter(NPC, NPCS.NPCSprite, NPCS.IntroductionLines);
-			TextSent= true;
-		}
-		
 	}
 
-	void CheckIfIntroduced(GameObject NPC)
-	{
-
-	}
 
 	#endregion
 	#region BodySpecific

@@ -623,8 +623,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0.158, y: 1}
-  m_AnchoredPosition: {x: -0.000030517578, y: 0}
-  m_SizeDelta: {x: 0.000022888, y: 0}
+  m_AnchoredPosition: {x: -0.000030517578, y: -6.8174}
+  m_SizeDelta: {x: 0, y: 13.6347}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2743709954374594597
 CanvasRenderer:
@@ -705,6 +705,95 @@ RectTransform:
   m_AnchoredPosition: {x: 9.054382, y: 1.7796249}
   m_SizeDelta: {x: 85.65692, y: 151.26889}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &3529976710069809141
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8478596341563900988}
+  m_Layer: 0
+  m_Name: NPCs
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8478596341563900988
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3529976710069809141}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8833181882476219568}
+  - {fileID: 8067869084552906725}
+  m_Father: {fileID: 975605564052385631}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3688500484486637755
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8067869084552906725}
+  - component: {fileID: 7916930825875816659}
+  m_Layer: 0
+  m_Name: Romeo
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8067869084552906725
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3688500484486637755}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8478596341563900988}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7916930825875816659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3688500484486637755}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cc5c66463268e34eb1112dc26489365, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NPCSprite: {fileID: 21300000, guid: 526dca9f5a9729e4ea3520a3da59c92d, type: 3}
+  IntroductionLines:
+  - 'You have answered my summons! '
+  - Build me a body and I will help you keep the night long and spooky.
+  - Come back to me when you have enough parts to make a body!
+  GoodAcceptance:
+  - Awesome! I have added more time.
+  - I will let all my friends know to contact you!
+  NPCName: 
+  IsSpeaking: 0
+  IsAccepted: 0
+  IsIntroduced: 0
 --- !u!1 &3945185271820704198
 GameObject:
   m_ObjectHideFlags: 0
@@ -1520,7 +1609,7 @@ Transform:
   - {fileID: 2117416066014053785}
   - {fileID: 7596830103220836803}
   - {fileID: 3343522102804311129}
-  - {fileID: 8833181882476219568}
+  - {fileID: 8478596341563900988}
   - {fileID: 8886856650123486498}
   - {fileID: 8187263329596501086}
   m_Father: {fileID: 0}
@@ -1565,7 +1654,10 @@ MonoBehaviour:
   NPCPrefab: {fileID: 0}
   ActiveNPC: {fileID: 0}
   NPCScript: {fileID: 0}
-  NPCsQueue: []
+  NPCsQueue:
+  - {fileID: 8499505463802767417}
+  - {fileID: 3688500484486637755}
+  NPCIndex: 0
   CurrentNPC: {fileID: 0}
   TutorialMan: {fileID: 8499505463802767417}
   Romeo: {fileID: 0}
@@ -1584,18 +1676,18 @@ MonoBehaviour:
   Type1LeftArm: {fileID: 21300000, guid: 53d5cfdd3cbf2414da5cb3203c396080, type: 3}
   Type1RightLeg: {fileID: 21300000, guid: 8cd6f6b7245bd9946b9358f9ec22f3ca, type: 3}
   Type1LeftLeg: {fileID: 21300000, guid: 37961b135a328d44d9be501cc469202c, type: 3}
-  Type2Head: {fileID: 0}
-  Type2Torso: {fileID: 0}
-  Type2RightArm: {fileID: 0}
-  Type2LeftArm: {fileID: 0}
-  Type2RightLeg: {fileID: 0}
-  Type2LeftLeg: {fileID: 0}
-  Type3Head: {fileID: 0}
-  Type3Torso: {fileID: 0}
-  Type3RightArm: {fileID: 0}
-  Type3LeftArm: {fileID: 0}
-  Type3RightLeg: {fileID: 0}
-  Type3LeftLeg: {fileID: 0}
+  Type2Head: {fileID: 21300000, guid: d925967189c89064b9608bfd55201ed9, type: 3}
+  Type2Torso: {fileID: 21300000, guid: d715cb5d4758d4b4d890928b87881f61, type: 3}
+  Type2RightArm: {fileID: 21300000, guid: ae0f18f283ee6f1459b205e84227fcc4, type: 3}
+  Type2LeftArm: {fileID: 21300000, guid: d24768821fb60f942a1b693e97fef200, type: 3}
+  Type2RightLeg: {fileID: 21300000, guid: c61daa0b252683e41b33ba4821093a0e, type: 3}
+  Type2LeftLeg: {fileID: 21300000, guid: 280c71fc6d6f99240a92b203dc74eee5, type: 3}
+  Type3Head: {fileID: 21300000, guid: 9a4574514ce767e479fd4172725b3c88, type: 3}
+  Type3Torso: {fileID: 21300000, guid: 5e34de4233eb01b4f916f02577da8641, type: 3}
+  Type3RightArm: {fileID: 21300000, guid: eecf12bdd6c9d5f41ac43b53554cb222, type: 3}
+  Type3LeftArm: {fileID: 21300000, guid: 8222d7127ad2213489bb9d716b934c5b, type: 3}
+  Type3RightLeg: {fileID: 21300000, guid: b250aa660044b1d4d99415c2239eb34d, type: 3}
+  Type3LeftLeg: {fileID: 21300000, guid: 16bda361102b49e48b2eb184c269997b, type: 3}
   currentProgramState: 0
   AudioManager: {fileID: 2172954261722312593}
   MainMusic: {fileID: 8300000, guid: 29b7669efd4e2e947a7e933de4707d4c, type: 3}
@@ -1604,6 +1696,7 @@ MonoBehaviour:
   inactiveSummoningSprite: {fileID: 21300000, guid: 160d942b34954b74ebe30659b215d78a, type: 3}
   PHsprite: {fileID: 21300000, guid: 0fcb3dbb251b52c44ab3323158ffea6a, type: 3}
   NPCS: []
+  TextSent: 0
 --- !u!1 &7633295790047883264
 GameObject:
   m_ObjectHideFlags: 0
@@ -1932,6 +2025,7 @@ MonoBehaviour:
   legLeftImageObject: {fileID: 7668588639668819399}
   legRightImage: {fileID: 4855580867355458029}
   legRightImageObject: {fileID: 5731920447601370450}
+  TextAccepted: 0
 --- !u!1 &8499505463802767417
 GameObject:
   m_ObjectHideFlags: 0
@@ -1957,12 +2051,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8499505463802767417}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 975605564052385631}
+  m_Father: {fileID: 8478596341563900988}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7112292141480782090
 MonoBehaviour:
@@ -1976,13 +2070,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cc5c66463268e34eb1112dc26489365, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NPCSprite: {fileID: 21300000, guid: 526dca9f5a9729e4ea3520a3da59c92d, type: 3}
+  NPCSprite: {fileID: 21300000, guid: 58ae3a36e94c38a4981a57f0fbebb187, type: 3}
   IntroductionLines:
   - 'You have answered my summons! '
   - Build me a body and I will help you keep the night long and spooky.
   - Come back to me when you have enough parts to make a body!
+  GoodAcceptance:
+  - Awesome! I have added more time.
+  - I will let all my friends know to contact you!
   NPCName: 
-  Introduced: 0
+  IsSpeaking: 0
+  IsAccepted: 0
+  IsIntroduced: 0
 --- !u!1 &9081563024930525785
 GameObject:
   m_ObjectHideFlags: 0
