@@ -2096,7 +2096,6 @@ MonoBehaviour:
   Failure:
   - Oh no! The sun is coming up!
   - I can't belive you failed!
-  - Press "ESCAPE" To return to the menu!
 --- !u!1 &9081563024930525785
 GameObject:
   m_ObjectHideFlags: 0
