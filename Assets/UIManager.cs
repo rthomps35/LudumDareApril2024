@@ -39,10 +39,27 @@ public class UIManager : MonoBehaviour
 	[SerializeField] GameObject TitleScreenItems;
 	[SerializeField] GameObject MainGameItems;
 
+	#region BodyItems
+	[SerializeField] UnityEngine.UI.Image headImage;
+	[SerializeField] GameObject headImageObject;
+	[SerializeField] UnityEngine.UI.Image torsoImage;
+	[SerializeField] GameObject torsoImageObject;
+	[SerializeField] UnityEngine.UI.Image armLeftImage;
+	[SerializeField] GameObject armLeftImageObject;
+	[SerializeField] UnityEngine.UI.Image armRightImage;
+	[SerializeField] GameObject armRightImageObject;
+	[SerializeField] UnityEngine.UI.Image legLeftImage;
+	[SerializeField] GameObject legLeftImageObject;
+	[SerializeField] UnityEngine.UI.Image legRightImage;
+	[SerializeField] GameObject legRightImageObject;
+
+	#endregion
+
 
 	private void Awake()
 	{
 		TextImageObject.SetActive(false);
+		UIBodyClear();
 	}
 
 	public void UIMode()
@@ -124,6 +141,98 @@ public class UIManager : MonoBehaviour
 	{
 		textEndSec = gameManager.TotalGameSeconds + TextLinger;
 		textBox.text = LineToWrite;
+	}
+
+	//BodyClear
+	public void UIBodyClear()
+	{
+		headImage.sprite = null;
+		headImageObject.SetActive(false);
+		torsoImage.sprite = null;
+		torsoImageObject.SetActive(false);
+		legLeftImage.sprite = null;
+		legLeftImageObject.SetActive(false);
+		legRightImage.sprite = null;
+		legRightImageObject.SetActive(false);
+		armLeftImage.sprite = null;
+		armLeftImageObject.SetActive(false);
+		armRightImage.sprite = null;
+		armRightImageObject.SetActive(false);
+	}
+
+	public void UIAddPart(GameManager.BodyPart BodyPart, GraveScript.GraveType Type)
+	{
+		switch(BodyPart)
+		{
+			case(GameManager.BodyPart.Head):
+				headImageObject.SetActive(true);
+				switch (Type)
+				{
+					case(GraveScript.GraveType.Type1):
+						headImage.sprite = gameManager.Type1Head;
+						break;
+					case (GraveScript.GraveType.Type2):
+						headImage.sprite = gameManager.Type2Head;
+						break;
+					case (GraveScript.GraveType.Type3):
+						headImage.sprite = gameManager.Type3Head;
+						break;
+				}
+				break;
+			case (GameManager.BodyPart.Torso):
+				torsoImageObject.SetActive(true);
+				switch (Type)
+				{
+					case (GraveScript.GraveType.Type1):
+						torsoImage.sprite = gameManager.Type1Torso;
+						break;
+					case (GraveScript.GraveType.Type2):
+						torsoImage.sprite = gameManager.Type2Torso;
+						break;
+					case (GraveScript.GraveType.Type3):
+						torsoImage.sprite = gameManager.Type3Torso;
+						break;
+				}
+				break;
+			case (GameManager.BodyPart.Arms):
+				armLeftImageObject.SetActive(true);
+				armRightImageObject.SetActive(true);
+				switch (Type)
+				{
+					case (GraveScript.GraveType.Type1):
+						armLeftImage.sprite = gameManager.Type1LeftArm;
+						armRightImage.sprite = gameManager.Type1RightArm;
+						break;
+					case (GraveScript.GraveType.Type2):
+						armLeftImage.sprite = gameManager.Type2LeftArm;
+						armRightImage.sprite = gameManager.Type2RightArm;
+						break;
+					case (GraveScript.GraveType.Type3):
+						armLeftImage.sprite = gameManager.Type3LeftArm;
+						armRightImage.sprite = gameManager.Type3RightArm;
+						break;
+				}
+				break;
+			case (GameManager.BodyPart.Legs):
+				legLeftImageObject.SetActive(true);
+				legRightImageObject.SetActive(true);
+				switch (Type)
+				{
+					case (GraveScript.GraveType.Type1):
+						legLeftImage.sprite = gameManager.Type1LeftLeg;
+						legRightImage.sprite = gameManager.Type1RightLeg;
+						break;
+					case (GraveScript.GraveType.Type2):
+						legLeftImage.sprite = gameManager.Type2LeftLeg;
+						legRightImage.sprite = gameManager.Type2RightLeg;
+						break;
+					case (GraveScript.GraveType.Type3):
+						legLeftImage.sprite = gameManager.Type3LeftLeg;
+						legRightImage.sprite = gameManager.Type3RightLeg;
+						break;
+				}
+				break;
+		}
 	}
 
 
