@@ -15,10 +15,10 @@ using static System.Net.Mime.MediaTypeNames;
 public class UIManager : MonoBehaviour
 {
 	public bool coroutineRunning;
-	[SerializeField] TMP_Text timerText;
-	[SerializeField] TMP_Text textBox;
-	[SerializeField] UnityEngine.UI.Image textImage;
-	[SerializeField] GameObject TextImageObject;
+	public TMP_Text? timerText;
+	public TMP_Text? textBox;
+	public UnityEngine.UI.Image? textImage;
+	public GameObject? TextImageObject;
 	[SerializeField] string CurrentText;
 	//bool longformText = false;
 
@@ -35,24 +35,23 @@ public class UIManager : MonoBehaviour
 
 	[SerializeField] int TextLinger;
 	float coroutineSpeed;
-	bool coroutineTimer;
 
-	public GameObject TitleScreenItems;
-	[SerializeField] GameObject MainGameItems;
+
+	
 
 	#region BodyItems
-	[SerializeField] UnityEngine.UI.Image headImage;
-	[SerializeField] GameObject headImageObject;
-	[SerializeField] UnityEngine.UI.Image torsoImage;
-	[SerializeField] GameObject torsoImageObject;
-	[SerializeField] UnityEngine.UI.Image armLeftImage;
-	[SerializeField] GameObject armLeftImageObject;
-	[SerializeField] UnityEngine.UI.Image armRightImage;
-	[SerializeField] GameObject armRightImageObject;
-	[SerializeField] UnityEngine.UI.Image legLeftImage;
-	[SerializeField] GameObject legLeftImageObject;
-	[SerializeField] UnityEngine.UI.Image legRightImage;
-	[SerializeField] GameObject legRightImageObject;
+	public UnityEngine.UI.Image? headImage;
+	public GameObject? headImageObject;
+	public UnityEngine.UI.Image? torsoImage;
+	public GameObject? torsoImageObject;
+	public UnityEngine.UI.Image? armLeftImage;
+	public GameObject? armLeftImageObject;
+	public UnityEngine.UI.Image? armRightImage;
+	public GameObject? armRightImageObject;
+	public UnityEngine.UI.Image? legLeftImage;
+	public GameObject? legLeftImageObject;
+	public UnityEngine.UI.Image? legRightImage;
+	public GameObject? legRightImageObject;
 
 	#endregion
 
@@ -61,13 +60,13 @@ public class UIManager : MonoBehaviour
 
 	private void Awake()
 	{
-		TextImageObject.SetActive(false);
-		UIBodyClear();
+		//TextImageObject.SetActive(false);
+		//UIBodyClear();
 	}
-
+	
 	public void UIMode()
 	{
-		string SceneName = SceneManager.GetActiveScene().name;
+	/*	string SceneName = SceneManager.GetActiveScene().name;
 
 		switch (SceneName)
 		{
@@ -79,11 +78,12 @@ public class UIManager : MonoBehaviour
 				TitleScreenItems.SetActive(false);
 				MainGameItems.SetActive(true);
 				break;
-		}
+		}*/
 	}
 
 	public void UIMode(string SceneName)
 	{
+		/*
 		switch (SceneName)
 		{
 			case ("TitleScreen"):
@@ -95,6 +95,7 @@ public class UIManager : MonoBehaviour
 				MainGameItems.SetActive(true);
 				break;
 		}
+		*/
 	}
 
 	//new text system

@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
 {
 	bool lostGame = false;
 	public int EndTime;
+	bool fuck;
 
 	#region ChildObjects and their Scripts
 	[SerializeField] GameObject GameManger;	
@@ -180,7 +181,7 @@ public class GameManager : MonoBehaviour
 		MapGenerated= false;
 		UIManagerScript.UIMode();
 		Time.timeScale = 1;
-		UIManagerScript.TitleScreenItems.transform.position =new Vector2(GameCamera.transform.position.x,GameCamera.transform.position.y);
+		//UIManagerScript.TitleScreenItems.transform.position =new Vector2(GameCamera.transform.position.x,GameCamera.transform.position.y);
 
 	}
 
@@ -197,7 +198,7 @@ public class GameManager : MonoBehaviour
 	void Update()
 	{	
 		ProgramLoop();
-		TicLoop();
+		//TicLoop();
 		//
 		//Loss Check
 	}
@@ -211,12 +212,17 @@ public class GameManager : MonoBehaviour
 				TitlePageScreen();
 				break;
 			case programState.MainGame:
-				
+				if(fuck == false)
+				{
+					NewNewSet();
+					fuck = true;
+				}
 				//MainGameLoop
 				cameraUpdate(); //Move the camera to follow the player
 
 				//player
 				playerController.PokemonController();
+				TicLoop();
 				break;
 
 
@@ -364,7 +370,7 @@ public class GameManager : MonoBehaviour
 			}
 		}
 		UIManagerScript.UIMode();
-		UIManagerScript.TitleScreenItems.transform.position = new Vector2(GameCamera.transform.position.x, GameCamera.transform.position.y);
+		//UIManagerScript.TitleScreenItems.transform.position = new Vector2(GameCamera.transform.position.x, GameCamera.transform.position.y);
 		MapGenerated = false;
 		player.SetActive(false);
 		//Start playing title music?
@@ -375,9 +381,32 @@ public class GameManager : MonoBehaviour
 	#endregion
 
 	#region MainGame Specific Code
-	void NewGameSetUp()
+	public void NewNewSet()
 	{
-		
+
+		MinutesRemaining = startingTimeMinutes; //set timer
+		SecondsRemaining = 0;
+		UIManagerScript = GameObject.FindGameObjectWithTag("GameManager").GetComponent<UIManager>();
+		UIManagerScript.UpdateUIEachSecond(MinutesRemaining, SecondsRemaining); //update the timer
+		gameMap.SetActive(true);
+		//player = Instantiate(PlayerPrefab, new Vector3(activeSummonSpawn.transform.position.x, activeSummonSpawn.transform.position.y, -1), Quaternion.identity);
+		player.transform.position = new Vector2(activeSummonSpawn.transform.position.x, activeSummonSpawn.transform.position.y);
+		player.SetActive(true);
+		//playerController = player.GetComponent<PlayerController>();
+		playerController.GameManager = this;
+		GameCamera.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, -3); //Move camera to active spawn
+		UIManagerScript.UIMode("MainGame");
+		currentProgramState = programState.MainGame;
+		NPCToIntroduce = true;
+		CurrentNPC = TutorialMan;
+		MainGameStart();
+		Debug.Log(SceneManager.GetActiveScene().name);
+	}
+
+	
+	public void NewGameSetUp()
+	{
+		/*
 		MinutesRemaining = startingTimeMinutes; //set timer
 		SecondsRemaining = 0;
 		UIManagerScript = GameObject.FindGameObjectWithTag("UI").GetComponent<UIManager>();
@@ -394,7 +423,7 @@ public class GameManager : MonoBehaviour
 		NPCToIntroduce = true;
 		CurrentNPC = TutorialMan;
 		MainGameStart();
-		Debug.Log(SceneManager.GetActiveScene().name);
+		Debug.Log(SceneManager.GetActiveScene().name);*/
 	}
 
 	void MainGameStart()
